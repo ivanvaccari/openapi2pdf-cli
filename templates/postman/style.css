@@ -1,0 +1,65 @@
+html, body {
+    font-family: Arial, sans-serif;
+             
+}
+
+
+.page-break { 
+    display: block; 
+    page-break-before: always;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+h3 {
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+h4 {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+
+.front-page {
+    height: 100%;
+    text-align: center;
+    margin-top: 200px;
+}
+
+.front-page .description {
+    margin-top: 12px;
+    color: #555;
+}
+
+.front-page .current-version {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #333;
+}
+
+.revision-page{
+
+}
+
+.revision-page .revision-table {
+    border-collapse: collapse;
+    border: 1px solid #777777
+}
+
+/* .revision-page .revision-table should have internal borders */
+.revision-page .revision-table th, .revision-page .revision-table td {
+    border: 1px solid #777777;
+    background-color: aqua;
+    padding: 3px 4px;
+    text-align: left;
+}

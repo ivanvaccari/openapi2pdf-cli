@@ -1,0 +1,4 @@
+node_modules
+openapi2pdf.config.*
+output
+dist

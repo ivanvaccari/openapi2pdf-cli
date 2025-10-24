@@ -1,0 +1,27 @@
+{
+  "name": "openapi2pdf2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node dist/index.js --config openapi2pdf.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@jsreport/jsreport-chrome-pdf": "^4.3.0",
+    "@jsreport/jsreport-core": "^4.7.1",
+    "@jsreport/jsreport-handlebars": "^4.0.1",
+    "@types/jsreport": "^2.9.4",
+    "@types/node": "^22.16.0",
+    "axios": "^1.12.2",
+    "commander": "^14.0.1",
+    "handlebars": "^4.7.8",
+    "puppeteer": "^24.26.1",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
