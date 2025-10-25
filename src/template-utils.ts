@@ -3,6 +3,8 @@ import path from "path";
 import { ConfigFile, GenericObject, TemplateFiles } from "./types";
 import Handlebars from "handlebars";
 import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
+import _ from "lodash";
+import { marked } from "marked";
 
 export const templateFilenames: TemplateFiles = {
     style: "style.css",
@@ -15,8 +17,9 @@ export const templateFilenames: TemplateFiles = {
     assumptions: "assumptions.hbs",
     authentication: "authentication.hbs",
     operation: "operation.hbs",
+    operationParameter: "operation-parameter.hbs",
+    operationParametersHeader: "operation-parameters-header.hbs",
 };
-
 
 /**
  * Find the path where the template is located.
@@ -81,10 +84,7 @@ export async function loadTemplateFiles(
             const base64Data = fileBufer.toString("base64");
             const ext = path.extname(originalUrl).substring(1);
             const dataUrl = `data:image/${ext};base64,${base64Data}`;
-            templates.style = templates.style.replace(
-                originalUrl,
-                dataUrl,
-            );
+            templates.style = templates.style.replace(originalUrl, dataUrl);
         }
     }
 
@@ -102,15 +102,55 @@ export async function loadTemplateFiles(
                 const base64Data = fileBufer.toString("base64");
                 const ext = path.extname(originalSrc).substring(1);
                 const dataUrl = `data:image/${ext};base64,${base64Data}`;
-                templates[key] = templates[key].replace(
-                    originalSrc,
-                    dataUrl,
-                );
+                templates[key] = templates[key].replace(originalSrc, dataUrl);
             }
         }
     }
 
     return templates;
+}
+
+/**
+ * Preprocess a parameter object to extract useful information for templating
+ *
+ * @param parameter
+ * @param openApiSpecJson
+ * @returns
+ */
+function preprocessParameter(
+    inutParameter: OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject,
+    openApiSpecJson: OpenAPIV3.Document,
+): Object {
+    let schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined;
+    let parameter: OpenAPIV3.ParameterObject | undefined;
+    // Resolve $ref if present
+    if (Object.hasOwn(inutParameter, "$ref")) {
+        const parameterRef = inutParameter as OpenAPIV3.ReferenceObject;
+        const pathParts = parameterRef.$ref.split("/");
+        if (pathParts[0] === "#") {
+            parameter = _.cloneDeep(_.get(openApiSpecJson, pathParts.slice(1)));
+        }
+    }
+
+    if (!parameter) return { parameter: inutParameter };
+
+    schema = _.cloneDeep(parameter.schema);
+    if (!schema) return { parameter: parameter };
+    if (schema && Object.hasOwn(schema, "$ref")) {
+        return { parameter: parameter };
+    }
+
+    const { type, ...schemaObjectWithoutType } =
+        schema as OpenAPIV3.SchemaObject;
+    return {
+        parameter: {
+            ...parameter,
+            description: parameter.description ? marked.parse(parameter.description || ""): undefined,
+            type: type,
+            isArray: type === "array",
+            schema: JSON.stringify(schemaObjectWithoutType, null, 2),
+        },
+    };
 }
 
 /**
@@ -122,29 +162,64 @@ function buildOpenApiTemplateV3(
     templates: TemplateFiles,
     openApiSpecJson: OpenAPIV3.Document,
 ): string {
-const renderedOperations: string[] = [];
-    
+    const renderedOperations: string[] = [];
+
     // prepare some templates to be used during rendering
     const operationTemplate = Handlebars.compile(templates.operation);
+    const operationParametersTemplate = Handlebars.compile(
+        templates.operationParameter,
+    );
+    const operationParametersHeaderTemplate = Handlebars.compile(
+        templates.operationParametersHeader,
+    );
 
     // Start rendering operations
     for (const path in openApiSpecJson.paths) {
-
         const pathItem = openApiSpecJson.paths[path];
         // this is only for type checking
         if (!pathItem) continue;
 
-        for (const method of ['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'trace']) {
+        for (const method of [
+            "get",
+            "post",
+            "put",
+            "delete",
+            "patch",
+            "options",
+            "head",
+            "trace",
+        ]) {
             // ignore if the method does not exist on the path item
             if (!(method in pathItem)) continue;
 
             const operation = (pathItem as any)[method];
 
-            const operationHtml = operationTemplate({ 
-                operation: operation,
+            // process the parameters
+            const parametersHtml: string[] = [];
+            if (operation.parameters && Array.isArray(operation.parameters)) {
+                for (const parameter of operation.parameters) {
+                    const parameterHtml = operationParametersTemplate(
+                        preprocessParameter(parameter, openApiSpecJson),
+                    );
+                    parametersHtml.push(parameterHtml);
+                }
+            }
+
+            const parametersHeaderHtml = operationParametersHeaderTemplate({});
+
+            const operationHtml = operationTemplate({
+                operation: {
+                    ...operation,
+                    parameters:
+                        parametersHtml.length > 0
+                            ? parametersHtml.join("\n")
+                            : undefined,
+                    parametersHeader: parametersHeaderHtml,
+                },
                 path: path,
-                method: method.toUpperCase()
+                method: method.toUpperCase(),
             });
+
             renderedOperations.push(operationHtml);
         }
     }
@@ -161,8 +236,7 @@ function buildOpenApiTemplateV3_1(
     templates: TemplateFiles,
     openApiSpecJson: OpenAPIV3_1.Document,
 ): string {
-
-    return 'bbb'
+    return "bbb";
 }
 
 /**

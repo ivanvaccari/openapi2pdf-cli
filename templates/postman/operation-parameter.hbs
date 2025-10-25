@@ -1,0 +1,22 @@
+<div class="operation-parameter">
+    <div class="parameter-name">{{parameter.name}}</div>
+    <div class="parameter-type">{{parameter.type}}</div>
+    <div class="parameter-in">{{parameter.in}}</div>
+    <div class="parameter-required">
+        {{#if parameter.required}}
+            required
+        {{/if}}
+    </div>
+    <div class="parameter-description">
+    {{#if parameter.description}}
+        <!-- this is a preprocesed description in HTML -->
+        <div class="parameter-description-label">{{{parameter.description}}}</div>
+    {{/if}}
+    {{#if parameter.schema}}
+        {{#if parameter.isArray}}
+            <div class="parameter-description-label-comment">Each item of the array:</div>
+        {{/if}}
+        <pre>{{parameter.schema}}</pre>
+    {{/if}}
+    </div>
+</div>

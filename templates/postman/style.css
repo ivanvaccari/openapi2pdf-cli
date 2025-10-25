@@ -1,5 +1,9 @@
+:root{
+    --border-light: #dddddd;
+    --bg-light: #dddddd;
+}
+
 html, body {
-    font-family: Arial, sans-serif;
     color: #333;
 }
 
@@ -52,16 +56,16 @@ h4 {
 .revision-page .revision-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #777777
+    border: 1px solid var(--border-light);
 }
 
 
 .revision-page .revision-table tr th {
-    background-color: #aaaaaa;
+    background-color: var(--bg-light);
 }
 
 .revision-page .revision-table th, .revision-page .revision-table td {
-    border: 1px solid #777777;
+    border: 1px solid var(--border-light);
     padding: 5px 8px;
     text-align: left;
 }
@@ -73,31 +77,33 @@ h4 {
 
 .summary-page .server-info {
 
-
-
 }
 
 
 .operation {
     margin-bottom: 20px;
     padding: 10px;
-    border: 1px solid #dddddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    
 }
 
 .operation-header {
     display: flex;
     flex-direction: row;
+    border: 1px solid #dddddd;
+    border-radius: 2px;
+    background-color: #f9f9f9;
+    padding: 4px;
+    align-items: center;
 }
 
 .operation-method {
     font-weight: bold;
     color: #ffffff;
-    padding: 4px 8px;
+    padding: 3px 8px;
     border-radius: 3px;
     margin-right: 10px;
     text-transform: uppercase;
+    font-size: 80%;
 }
 
 .operation-method.GET {
@@ -112,6 +118,10 @@ h4 {
 .operation-method.DELETE {
     background-color: #dc3545;
 }
+.operation-method.PATCH {
+    background-color: #17a2b8;
+}
+
 .operation-path {
     font-family: monospace;
     font-size: 1.1em;
@@ -119,6 +129,7 @@ h4 {
 
 .operation .operation-summary {
     margin-top: 8px;
+    font-size: 90%;
     font-style: italic;
     color: #555555;
 }
@@ -126,3 +137,78 @@ h4 {
 .operation .operation-description {
     margin-top: 10px;
 }
+
+
+.operation-parameters {
+    display: table;
+    width: 100%;
+}
+
+.operation-parameters .operation-parameter {
+    margin-top: 5px;
+    padding-top: 5px;
+    display: table-row
+}
+
+.operation-parameters .operation-parameter .parameter-name {
+    font-weight: bold;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 10px;
+    display: table-cell;
+}
+
+.operation-parameters .operation-parameter .parameter-in {
+    display: table-cell;
+}
+
+.operation-parameters .operation-parameter .parameter-required {
+    color: #d9534f;
+    display: table-cell;
+}
+
+.operation-parameters .operation-parameter .parameter-type  {
+    display: table-cell;
+}
+
+.operation-parameters .operation-parameter .parameter-description {
+    display: table-cell;
+}
+
+.operation-parameters .operation-parameter .parameter-description .parameter-description-text {
+}
+
+
+
+pre {
+    background-color: #1c1c1c;
+    /* border: 1px solid var(--border-light);*/
+    padding: 3px 5px;
+    font-family: monospace;
+    margin-top: 4px;
+    border-radius: 2px;
+    color: #f1f1f1;
+}
+
+.operation-parameters .operation-parameter .parameter-description .parameter-description-label-comment{
+    color: #777777;
+}
+
+
+.operation-parameters .operation-parameter-header {
+    display: table-row;
+    font-weight: bold;
+}
+
+.operation-parameters .operation-parameter-header .parameter-name,
+.operation-parameters .operation-parameter-header .parameter-type,
+.operation-parameters .operation-parameter-header .parameter-in,
+.operation-parameters .operation-parameter-header .parameter-required,
+.operation-parameters .operation-parameter-header .parameter-description {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-light);
+    display: table-cell;
+}
+
+

@@ -189,4 +189,14 @@ export type TemplateFiles = {
      * Template to be used for each operation documentation
      */
     operation: string;
+
+    /**
+     * Template for operation parameter
+     */
+    operationParameter: string;
+
+    /**
+     * Header template for operation parameters section
+     */
+    operationParametersHeader: string;
 };
