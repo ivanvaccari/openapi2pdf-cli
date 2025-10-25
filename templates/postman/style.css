@@ -1,6 +1,6 @@
 html, body {
     font-family: Arial, sans-serif;
-             
+    color: #333;
 }
 
 
@@ -10,28 +10,27 @@ html, body {
 }
 
 h1 {
-    font-size: 24px;
+    font-size: 160%;
     margin-bottom: 10px;
 }
 
 h2 {
-    font-size: 20px;
+    font-size: 140%;
     margin-bottom: 8px;
 }
 
 h3 {
-    font-size: 16px;
+    font-size: 120%;
     margin-bottom: 6px;
 }
 
 h4 {
-    font-size: 12px;
+    font-size: 100%;
     margin-bottom: 4px;
 }
 
 
 .front-page {
-    height: 100%;
     text-align: center;
     margin-top: 200px;
 }
@@ -43,7 +42,6 @@ h4 {
 
 .front-page .current-version {
     margin-top: 6px;
-    font-size: 14px;
     color: #333;
 }
 
@@ -52,14 +50,79 @@ h4 {
 }
 
 .revision-page .revision-table {
+    width: 100%;
     border-collapse: collapse;
     border: 1px solid #777777
 }
 
-/* .revision-page .revision-table should have internal borders */
+
+.revision-page .revision-table tr th {
+    background-color: #aaaaaa;
+}
+
 .revision-page .revision-table th, .revision-page .revision-table td {
     border: 1px solid #777777;
-    background-color: aqua;
-    padding: 3px 4px;
+    padding: 5px 8px;
     text-align: left;
+}
+
+
+.summary-page {
+ 
+}
+
+.summary-page .server-info {
+
+
+
+}
+
+
+.operation {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.operation-header {
+    display: flex;
+    flex-direction: row;
+}
+
+.operation-method {
+    font-weight: bold;
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 3px;
+    margin-right: 10px;
+    text-transform: uppercase;
+}
+
+.operation-method.GET {
+    background-color: #28a745;
+}
+.operation-method.POST {
+    background-color: #007bff;
+}
+.operation-method.PUT {
+    background-color: #ffc107;
+}
+.operation-method.DELETE {
+    background-color: #dc3545;
+}
+.operation-path {
+    font-family: monospace;
+    font-size: 1.1em;
+}
+
+.operation .operation-summary {
+    margin-top: 8px;
+    font-style: italic;
+    color: #555555;
+}
+
+.operation .operation-description {
+    margin-top: 10px;
 }

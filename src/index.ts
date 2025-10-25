@@ -55,15 +55,15 @@ async function run() {
     }
 
     // Load the template files so the're ready to be used
-    const templateFiles = await loadTemplateFiles(templatePath);
+    const templates = await loadTemplateFiles(templatePath);
 
     // start to render the html.
-    const html = await renderHtml(configFile, templateFiles, openApiSpecJson);
+    const html = await renderHtml(configFile, templates, openApiSpecJson);
 
     // render the pdf
     let pdfBuffer: Buffer | undefined;
     if (configFile.ouputFiles?.pdf) {
-        pdfBuffer = await renderPdf(html, configFile, templateFiles);
+        pdfBuffer = await renderPdf(html, configFile, templates);
     }
     // save the output html if needed
     if (configFile.ouputFiles?.html) {

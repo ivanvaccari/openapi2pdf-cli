@@ -20,7 +20,7 @@ export async function renderPdf(
 ): Promise<Buffer> {
     jsreport.use(require("@jsreport/jsreport-chrome-pdf")());
     jsreport.use(require("@jsreport/jsreport-handlebars")());
-    jsreport.use(require("@jsreport/jsreport-pdf-utils")());
+    // jsreport.use(require("@jsreport/jsreport-pdf-utils")());
     
     await jsreport.init();
 

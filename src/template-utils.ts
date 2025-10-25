@@ -2,8 +2,9 @@ import fs from "fs/promises";
 import path from "path";
 import { ConfigFile, GenericObject, TemplateFiles } from "./types";
 import Handlebars from "handlebars";
+import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 
-export const templateFiles: TemplateFiles = {
+export const templateFilenames: TemplateFiles = {
     style: "style.css",
     header: "header.hbs",
     footer: "footer.hbs",
@@ -11,7 +12,11 @@ export const templateFiles: TemplateFiles = {
     lastpage: "lastpage.hbs",
     revisions: "revisions.hbs",
     summary: "summary.hbs",
+    assumptions: "assumptions.hbs",
+    authentication: "authentication.hbs",
+    operation: "operation.hbs",
 };
+
 
 /**
  * Find the path where the template is located.
@@ -52,13 +57,13 @@ export async function findTemplatePath(templatePath?: string): Promise<string> {
 export async function loadTemplateFiles(
     templatePath: string,
 ): Promise<TemplateFiles> {
-    const _templateFiles: TemplateFiles = { ...templateFiles };
+    const templates: TemplateFiles = { ...templateFilenames };
 
     // load the templates
-    for (const _key in _templateFiles) {
+    for (const _key in templates) {
         const key = _key as keyof TemplateFiles;
-        _templateFiles[key] = await fs
-            .readFile(path.join(templatePath, _templateFiles[key]))
+        templates[key] = await fs
+            .readFile(path.join(templatePath, templates[key]))
             .then((data) => data.toString());
     }
 
@@ -66,36 +71,98 @@ export async function loadTemplateFiles(
 
     // resolves "url(...)" in css to base64 data urls
     const regex = /url\(['"]([^'")]+)['"]\)/gm;
-    const matcher = _templateFiles.style.matchAll(regex);
+    const matcher = templates.style.matchAll(regex);
     for (const match of matcher) {
         const originalUrl = match[1];
-        if (originalUrl){
-            const fileBufer = await fs.readFile(path.join(templatePath, originalUrl));
-            const base64Data = fileBufer.toString('base64');
+        if (originalUrl) {
+            const fileBufer = await fs.readFile(
+                path.join(templatePath, originalUrl),
+            );
+            const base64Data = fileBufer.toString("base64");
             const ext = path.extname(originalUrl).substring(1);
             const dataUrl = `data:image/${ext};base64,${base64Data}`;
-            _templateFiles.style = _templateFiles.style.replace(originalUrl, dataUrl);
+            templates.style = templates.style.replace(
+                originalUrl,
+                dataUrl,
+            );
         }
     }
 
     // resolves "<img src="...">" in tempates to base64 imgs
     const imgRegex = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*>/gm;
-    for (const key of Object.keys(_templateFiles) as (keyof TemplateFiles)[]) {
-        const templateContent = _templateFiles[key];
+    for (const key of Object.keys(templates) as (keyof TemplateFiles)[]) {
+        const templateContent = templates[key];
         const imgMatcher = templateContent.matchAll(imgRegex);
         for (const match of imgMatcher) {
             const originalSrc = match[1];
             if (originalSrc) {
-                const fileBufer = await fs.readFile(path.join(templatePath, originalSrc));
-                const base64Data = fileBufer.toString('base64');
+                const fileBufer = await fs.readFile(
+                    path.join(templatePath, originalSrc),
+                );
+                const base64Data = fileBufer.toString("base64");
                 const ext = path.extname(originalSrc).substring(1);
                 const dataUrl = `data:image/${ext};base64,${base64Data}`;
-                _templateFiles[key] = _templateFiles[key].replace(originalSrc, dataUrl);
+                templates[key] = templates[key].replace(
+                    originalSrc,
+                    dataUrl,
+                );
             }
         }
     }
 
-    return _templateFiles;
+    return templates;
+}
+
+/**
+ * Process the OpenAPI specification V3.0.0 and build the template content
+ * @param openApiSpecJson
+ */
+function buildOpenApiTemplateV3(
+    configFile: ConfigFile,
+    templates: TemplateFiles,
+    openApiSpecJson: OpenAPIV3.Document,
+): string {
+const renderedOperations: string[] = [];
+    
+    // prepare some templates to be used during rendering
+    const operationTemplate = Handlebars.compile(templates.operation);
+
+    // Start rendering operations
+    for (const path in openApiSpecJson.paths) {
+
+        const pathItem = openApiSpecJson.paths[path];
+        // this is only for type checking
+        if (!pathItem) continue;
+
+        for (const method of ['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'trace']) {
+            // ignore if the method does not exist on the path item
+            if (!(method in pathItem)) continue;
+
+            const operation = (pathItem as any)[method];
+
+            const operationHtml = operationTemplate({ 
+                operation: operation,
+                path: path,
+                method: method.toUpperCase()
+            });
+            renderedOperations.push(operationHtml);
+        }
+    }
+
+    return renderedOperations.join("\n");
+}
+
+/**
+ * Process the OpenAPI specification V3.1.0 and build the template content
+ * @param openApiSpecJson
+ */
+function buildOpenApiTemplateV3_1(
+    configFile: ConfigFile,
+    templates: TemplateFiles,
+    openApiSpecJson: OpenAPIV3_1.Document,
+): string {
+
+    return 'bbb'
 }
 
 /**
@@ -106,26 +173,53 @@ export async function loadTemplateFiles(
  */
 export async function renderHtml(
     configFile: ConfigFile,
-    _templateFiles: TemplateFiles,
-    openApiSpecJson: GenericObject,
+    templates: TemplateFiles,
+    openApiSpecJson: OpenAPIV3.Document | OpenAPIV3_1.Document,
 ): Promise<string> {
+    // Generate the handlebars template for the OpenAPI spec
+    let openApiSpectHbs = "";
+    switch (openApiSpecJson.openapi.split(".").slice(0, 2).join(".")) {
+        case "3.0":
+            openApiSpectHbs = buildOpenApiTemplateV3(
+                configFile,
+                templates,
+                openApiSpecJson as OpenAPIV3.Document,
+            );
+            break;
+        case "3.1":
+            openApiSpectHbs = buildOpenApiTemplateV3_1(
+                configFile,
+                templates,
+                openApiSpecJson as OpenAPIV3_1.Document,
+            );
+            break;
+        default:
+            throw new Error(
+                `OpenAPI version ${openApiSpecJson.openapi} not supported`,
+            );
+    }
+
+    // append all together
     const finalTemplate = [
         "<html>",
         "<head>",
         "<style>",
-        _templateFiles.style,
+        templates.style,
         "</style>",
         "</head>",
         "<body>",
-        _templateFiles.frontpage,
-        _templateFiles.revisions,
-        _templateFiles.summary,
-        // ... altra roba qui
-        _templateFiles.lastpage,
+        templates.frontpage,
+        templates.revisions,
+        templates.summary,
+        templates.authentication,
+        templates.assumptions,
+        openApiSpectHbs,
+        templates.lastpage,
         "</body>",
         "</html>",
     ].join("\n");
 
+    // effectively render the template
     const template = Handlebars.compile(finalTemplate);
 
     return template({

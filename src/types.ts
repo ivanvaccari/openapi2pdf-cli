@@ -94,7 +94,12 @@ export type ConfigFile = {
      * - https://github.com/puppeteer/puppeteer/blob/v1.11.0/docs/api.md#pagepdfoptions
      */
     pdfOptions?: {
+        /**
+         * Scale of the webpage rendering. Defaults to 1, must be between 0.1 and 2.
+         * 0.1 -> text appear smaller, 2 -> text appear larger
+         */
         scale?: number;
+        
         displayHeaderFooter?: boolean;
         headerTemplate?: string;
         footerTemplate?: string;
@@ -169,4 +174,19 @@ export type TemplateFiles = {
      * Template to be inserted after revisions and before rest api documentation
      */
     summary: string;
+
+    /**
+     * Authentication modes description
+     */
+    authentication: string;
+
+    /**
+     * Assumptions for using these apis, like data formats 
+     */
+    assumptions: string;
+
+    /**
+     * Template to be used for each operation documentation
+     */
+    operation: string;
 };

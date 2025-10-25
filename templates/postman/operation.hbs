@@ -1,0 +1,18 @@
+<div class="operation">
+    <div class="operation-header">
+        <div class="operation-method {{method}}">{{method}}</div>
+        <div class="operation-path">{{path}}</div>
+    </div>
+    {{#if operation.summary}}
+        <div class="operation-summary">
+            {{operation.summary}}
+        </div>
+    {{/if}}
+
+    {{#if operation.description}}
+        <div class="operation-description">
+            <div>{{{operation.description}}}</div>
+        </div>
+    {{/if}}
+</div>
+
