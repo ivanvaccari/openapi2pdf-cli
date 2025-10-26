@@ -1,94 +1,49 @@
-import { ConfigFile, GenericObject, TemplateFiles } from "./types";
+import { ConfigFile, RenderedHtmlContent } from "./types";
+import puppeteer from "puppeteer";
 
 /**
- * Importing old style because jsreport does not have proper typescript support yet.
- * TODO: FInd another package.
- */
-const jsreport = require("@jsreport/jsreport-core")();
-
-/**
- * Converts the given HTML to PDF using jsreport
+ * Renders the given HTML content to PDF using puppeteer
  *
- * @param html
+ * @param content the rendered html content
  * @param configFile
- * @param templatefiles
+ * @returns
  */
 export async function renderPdf(
-    html: string,
+    content: RenderedHtmlContent,
     configFile: ConfigFile,
-    templatefiles: TemplateFiles,
 ): Promise<Buffer> {
-    jsreport.use(require("@jsreport/jsreport-chrome-pdf")());
-    jsreport.use(require("@jsreport/jsreport-handlebars")());
-    // jsreport.use(require("@jsreport/jsreport-pdf-utils")());
-    
-    await jsreport.init();
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-    // Note: genericObject because typing is incomplete.
-    // see https://jsreport.net/learn/pdf-utils
-    const pdfOperations: GenericObject[] = [];
+    await page.setContent(content.body);
 
-    if (templatefiles.header) {
-        pdfOperations.push({
-            type: "merge",
-            mergeWholeDocument: true,
-            renderForEveryPage: false,
-            enabled: true,
-            template: {
-                content: templatefiles.header,
-                engine: "handlebars",
-                recipe: "chrome-pdf",
-            },
-        });
-    }
+    // Replace comments in header and footer. If empty, no header/footer will be rendered.
+    const stripHtmlTagsRegex = /<!--[\s\S]*?(?:-->)/g;
+    const headerHtml = (content.header || "")
+        .replace(stripHtmlTagsRegex, "")
+        .trim();
+    const footerHtml = (content.footer || "")
+        .replace(stripHtmlTagsRegex, "")
+        .trim();
 
-    if (templatefiles.footer) {
-        pdfOperations.push({
-            type: "merge",
-            mergeWholeDocument: true,
-            renderForEveryPage: false,
-            enabled: true,
-            template: {
-                content: templatefiles.footer,
-                engine: "handlebars",
-                recipe: "chrome-pdf",
-            },
-        });
-    }
+    // Render the PDF
+    const pdfBuffer = await page.pdf({
+        format: "A4",
+        printBackground: true,
+        headerTemplate: headerHtml,
+        footerTemplate: footerHtml,
+        displayHeaderFooter: !!(headerHtml || footerHtml),
 
-    const renderConfig = {
-        template: {
-            content: html,
-            // Note: html is already rendered outside with handlebars because we wanted to also have the html on file.
-            // rendering it here would not have returned the html.
-            // This is why we use the "none" engine.
-            engine: "none",
-            recipe: "chrome-pdf",
-            pdfMeta: {
-                title:
-                    configFile.metadata?.pdf?.title || "REST API Documentation",
-                author: configFile.metadata?.pdf?.author || "",
-            },
-            pdfOperations: pdfOperations,
-
-            /**
-             * Chrome specific pdf options.
-             * See
-             * - https://jsreport.net/learn/chrome-pdf#options
-             * - https://github.com/puppeteer/puppeteer/blob/v1.11.0/docs/api.md#pagepdfoptions
-             */
-            chrome: configFile.pdfOptions || {},
-        }
-    };
-
-
-
-    console.log("Rendering PDF document, it may take a while...");
-
-    const result = await jsreport.render(renderConfig, {
-        metadata: configFile.metadata,
-        openApiUrl: configFile.openApiUrl,
+        margin: {
+            top: "15mm",
+            right: "15mm",
+            bottom: "15mm",
+            left: "15mm",
+        },
+        ...configFile.pdfOptions,
     });
 
-    return result.content;
+    await browser.close();
+
+    return Buffer.from(pdfBuffer);
 }

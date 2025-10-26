@@ -24,5 +24,13 @@
             {{{operation.parameters}}}
         </div>
     {{/if}}
+
+    {{#if operation.responses}}
+        <h4>Responses</h4>
+        <div class="operation-responses">
+            <!-- this is a pre-rendered block of operation responses -->
+            {{{operation.responses}}}
+        </div>
+    {{/if}}
 </div>
 

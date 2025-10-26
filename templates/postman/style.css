@@ -1,35 +1,44 @@
-:root{
+:root {
     --border-light: #dddddd;
     --bg-light: #dddddd;
+    --bg-ultralight: #f1f1f1;
+    --revisions-table-header-bg: var(--bg-light);
+    --revisions-table-border: var(--border-light);
+    --text-color-description: #444444;
+    --size-h1: 190%;
+    --size-h2: 160%;
+    --size-h3: 130%;
+    --size-h4: 100%;
 }
 
 html, body {
     color: #333;
+    font-family: Arial, sans-serif;
 }
 
 
-.page-break { 
-    display: block; 
+.page-break {
+    display: block;
     page-break-before: always;
 }
 
 h1 {
-    font-size: 160%;
+    font-size: var(--size-h1);
     margin-bottom: 10px;
 }
 
 h2 {
-    font-size: 140%;
+    font-size: var(--size-h2);
     margin-bottom: 8px;
 }
 
 h3 {
-    font-size: 120%;
+    font-size: var(--size-h3);
     margin-bottom: 6px;
 }
 
 h4 {
-    font-size: 100%;
+    font-size: var(--size-h4);
     margin-bottom: 4px;
 }
 
@@ -41,7 +50,7 @@ h4 {
 
 .front-page .description {
     margin-top: 12px;
-    color: #555;
+    color: var(--text-color-description);
 }
 
 .front-page .current-version {
@@ -49,19 +58,18 @@ h4 {
     color: #333;
 }
 
-.revision-page{
-
-}
+.revision-page {}
 
 .revision-page .revision-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--revisions-table-border);
 }
 
 
 .revision-page .revision-table tr th {
-    background-color: var(--bg-light);
+    background-color: var(--revisions-table-header-bg);
+    font-weight: bold;
 }
 
 .revision-page .revision-table th, .revision-page .revision-table td {
@@ -71,19 +79,15 @@ h4 {
 }
 
 
-.summary-page {
- 
-}
+.summary-page {}
 
-.summary-page .server-info {
-
-}
+.summary-page .server-info {}
 
 
 .operation {
     margin-bottom: 20px;
     padding: 10px;
-    
+
 }
 
 .operation-header {
@@ -109,15 +113,19 @@ h4 {
 .operation-method.GET {
     background-color: #28a745;
 }
+
 .operation-method.POST {
     background-color: #007bff;
 }
+
 .operation-method.PUT {
     background-color: #ffc107;
 }
+
 .operation-method.DELETE {
     background-color: #dc3545;
 }
+
 .operation-method.PATCH {
     background-color: #17a2b8;
 }
@@ -131,7 +139,7 @@ h4 {
     margin-top: 8px;
     font-size: 90%;
     font-style: italic;
-    color: #555555;
+    color: var(--text-color-description);
 }
 
 .operation .operation-description {
@@ -167,7 +175,7 @@ h4 {
     display: table-cell;
 }
 
-.operation-parameters .operation-parameter .parameter-type  {
+.operation-parameters .operation-parameter .parameter-type {
     display: table-cell;
 }
 
@@ -175,8 +183,7 @@ h4 {
     display: table-cell;
 }
 
-.operation-parameters .operation-parameter .parameter-description .parameter-description-text {
-}
+.operation-parameters .operation-parameter .parameter-description .parameter-description-text {}
 
 
 
@@ -190,7 +197,7 @@ pre {
     color: #f1f1f1;
 }
 
-.operation-parameters .operation-parameter .parameter-description .parameter-description-label-comment{
+.operation-parameters .operation-parameter .parameter-description .parameter-description-label-comment {
     color: #777777;
 }
 
@@ -211,4 +218,124 @@ pre {
     display: table-cell;
 }
 
+
+
+
+.operation-responses {
+    width: 100%;
+}
+
+
+.operation-responses .operation-response {
+    width: 100%;
+}
+
+.operation-responses .operation-response .operation-response-header {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.operation-responses .operation-response .operation-response-header .operation-response-code {}
+
+.operation-responses .operation-response .operation-response-header .operation-response-description {
+    font-style: italic;
+    color: var(--text-color-description);
+}
+
+.operation-responses .operation-response .operation-response-content {
+    margin-top: 6px;
+}
+
+
+
+.operation-response-content-type {
+    
+    width: 100%;
+}
+
+.operation-response-content-type .operation-response-content-type-content-type {
+    font-weight: bold;
+    
+}
+
+.operation-response-content-type .operation-response-content-type-content {
+  
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+
+/**
+* Json schema styles
+*/
+.schema {
+    margin-bottom: 20px;
+}
+.schema .schema-oneof {}
+
+.schema .schema-header {
+    
+}
+
+.schema .schema-header .schema-type {
+    font-size: 80%;
+}
+.schema .schema-header .schema-title {
+    font-size: var(--size-h2);
+    font-weight: bold;
+}
+
+.schema .schema-properties-header {
+    margin-top: 8px;
+    font-weight: bold;
+    font-size: var(--size-h3);
+}
+
+.schema .schema-properties {
+    margin-top: 4px;
+    width: 100%;
+}
+
+
+.schema .schema-property {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.schema .schema-property .schema-property-name {
+    font-weight: bold;
+    padding: 5px;
+    background-color: var(--bg-ultralight);
+}
+
+.schema .schema-property .schema-property-required {
+    padding: 5px;
+    color: #d9534f;
+    background-color: var(--bg-ultralight);
+
+}
+
+.schema .schema-property .schema-property-type {
+    padding: 5px;
+    flex-grow: 1;
+    background-color: var(--bg-ultralight);
+}
+
+.schema .schema-property .schema-property-description-container {
+    flex-basis: 100%;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.schema .schema-property .schema-property-description-container .schema-property-description {
+    color: var(--text-color-description);
+    font-style: italic;
+}
+.schema .schema-property .schema-property-description-container .schema-property-schema {
+    margin-top: 4px;
+}
 

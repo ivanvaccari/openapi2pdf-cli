@@ -1,3 +1,5 @@
+import { PaperFormat } from "puppeteer";
+
 export type ConfigFile = {
     /**
      * Template files directory. If provided, must be a reltive path directory.
@@ -11,7 +13,7 @@ export type ConfigFile = {
     /**
      * Output file path for the generated files
      */
-    ouputFiles: {
+    outputFiles: {
         /**
          * Path to the output pdf file. If omitted the pdf will not be generated
          */
@@ -89,9 +91,9 @@ export type ConfigFile = {
     };
 
     /**
-     * Pdf options.same as:
-     * - https://jsreport.net/learn/chrome-pdf#options
-     * - https://github.com/puppeteer/puppeteer/blob/v1.11.0/docs/api.md#pagepdfoptions
+     * This is a subset of https://pptr.dev/api/puppeteer.pdfoptions
+     *
+     * some options, like header and footer-related are managed via templates and cannot be set here.
      */
     pdfOptions?: {
         /**
@@ -99,21 +101,29 @@ export type ConfigFile = {
          * 0.1 -> text appear smaller, 2 -> text appear larger
          */
         scale?: number;
-        
-        displayHeaderFooter?: boolean;
-        headerTemplate?: string;
-        footerTemplate?: string;
-        printBackground?: boolean;
+
         pageRanges?: string;
-        format?: string;
+
+        /**
+         * Paper format. See https://pptr.dev/api/puppeteer.paperformat
+         * Defaults to 'A4'
+         */
+        format?: PaperFormat;
+
         width?: string | number;
         height?: string | number;
-        marginTop?: string | number;
-        marginRight?: string | number;
-        marginBottom?: string | number;
-        marginLeft?: string | number;
+
+        /**
+         * Page margins. See https://pptr.dev/api/puppeteer.pdfmargin
+         */
+        margin?: {
+            top?: string | number; // defaults to 15mm
+            right?: string | number; // defaults to 15mm
+            bottom?: string | number; // defaults to 15mm
+            left?: string | number; // defaults to 15mm
+        };
         mediaType?: string;
-    }
+    };
 
     /**
      * If defined, receives the open api specification json end must return an openapi specification json.
@@ -129,14 +139,7 @@ export type ConfigFile = {
  * A generic object with string keys and any type values
  */
 export type GenericObject = {
-    [key: string]:
-        | GenericObject
-        | GenericObject[]
-        | string
-        | number
-        | boolean
-        | null
-        | undefined;
+    [key: string]: GenericObject | GenericObject[] | string | number | boolean | null | undefined;
 };
 
 export type TemplateFiles = {
@@ -181,7 +184,7 @@ export type TemplateFiles = {
     authentication: string;
 
     /**
-     * Assumptions for using these apis, like data formats 
+     * Assumptions for using these apis, like data formats
      */
     assumptions: string;
 
@@ -199,4 +202,34 @@ export type TemplateFiles = {
      * Header template for operation parameters section
      */
     operationParametersHeader: string;
+
+    /**
+     * Template for operation response
+     */
+    operationResponse: string;
+
+    /**
+     * Template for operation response for a single content-type
+     */
+    operationResponseContentType: string;
+};
+
+/**
+ * Rendered html content
+ */
+export type RenderedHtmlContent = {
+    /**
+     * Body content of the rendered html
+     */
+    body: string;
+
+    /**
+     * Header content of the rendered html
+     */
+    header: string;
+
+    /**
+     * Footer content of the rendered html
+     */
+    footer: string;
 };

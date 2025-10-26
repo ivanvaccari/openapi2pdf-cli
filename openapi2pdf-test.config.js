@@ -29,14 +29,16 @@ module.exports = {
         ]    
     },
     pdfOptions:{
-        marginTop: "15mm",
-        marginBottom: "15mm",
-        marginLeft: "10mm",
-        marginRight: "10mm",
+        margin: {
+            top: "15mm",
+            right: "10mm",
+            bottom: "15mm",
+            left: "10mm"
+        },
         format: "A4",
-        scale: 0.8
+        scale: 0.75
     },
-    ouputFiles: {
+    outputFiles: {
         pdf: "output/test.pdf",
         html: "output/test.html"
     }

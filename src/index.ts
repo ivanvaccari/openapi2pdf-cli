@@ -58,23 +58,23 @@ async function run() {
     const templates = await loadTemplateFiles(templatePath);
 
     // start to render the html.
-    const html = await renderHtml(configFile, templates, openApiSpecJson);
+    const renderedContent = await renderHtml(configFile, templates, openApiSpecJson);
 
     // render the pdf
     let pdfBuffer: Buffer | undefined;
-    if (configFile.ouputFiles?.pdf) {
-        pdfBuffer = await renderPdf(html, configFile, templates);
+    if (configFile.outputFiles?.pdf) {
+        pdfBuffer = await renderPdf(renderedContent, configFile);
     }
     // save the output html if needed
-    if (configFile.ouputFiles?.html) {
-        fs.writeFileSync(configFile.ouputFiles.html, html);
-        console.log(`HTML document saved to ${configFile.ouputFiles.html}`);
+    if (configFile.outputFiles?.html) {
+        fs.writeFileSync(configFile.outputFiles.html, renderedContent.body);
+        console.log(`HTML document saved to ${configFile.outputFiles.html}`);
     }
 
     // save the output files
     if (pdfBuffer) {
-        fs.writeFileSync(configFile.ouputFiles.pdf, pdfBuffer);
-        console.log(`PDF document saved to ${configFile.ouputFiles.pdf}`);
+        fs.writeFileSync(configFile.outputFiles.pdf, pdfBuffer);
+        console.log(`PDF document saved to ${configFile.outputFiles.pdf}`);
     }
 }
 
