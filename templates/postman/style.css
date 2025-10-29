@@ -5,8 +5,9 @@
     --revisions-table-header-bg: var(--bg-light);
     --revisions-table-border: var(--border-light);
     --text-color-description: #444444;
-    --json-background-color: #2c2c2c;
-    --json-text-color: #f1f1f1;
+    --json-border-color: #888888;
+    --json-background-color: #eaeaea;
+    --json-text-color: #444444;
     --size-h1: 190%;
     --size-h2: 160%;
     --size-h3: 130%;
@@ -16,6 +17,12 @@
 html, body {
     color: #333;
     font-family: Arial, sans-serif;
+
+    /* Force content to stay within page boundaries */
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 
@@ -192,13 +199,19 @@ h4 {
 
 pre {
     background-color: var(--json-background-color);
-    /* border: 1px solid var(--border-light);*/
+    border: 1px solid var(--json-border-color);
     padding: 3px 5px;
     font-family: monospace;
     margin-top: 4px;
     border-radius: 2px;
-    font-size: 90%;
+    font-size: 80%;
     color: var(--json-text-color);
+    
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    max-width: 100%;
+
 }
 
 .operation-parameters .operation-parameter .parameter-description .parameter-description-label-comment {

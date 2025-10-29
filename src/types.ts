@@ -26,9 +26,9 @@ export type ConfigFile = {
     };
 
     /**
-     * Url of the open api specification
+     * Url or local file path of the open api specification.
      */
-    openApiUrl: string;
+    openapiJsonPath: string;
 
     metadata: {
         /**
@@ -212,6 +212,26 @@ export type TemplateFiles = {
      * Template for operation response for a single content-type
      */
     operationResponseContentType: string;
+
+    /**
+     * One line of the table of contents
+     */
+    tocLine: string;
+
+    /**
+     * Table of contents template
+     */
+    toc: string;
+
+    /**
+     * Template for the api page
+     */
+    api: string;
+
+    /**
+     * Template for the schemas section
+     */
+    schemas: string
 };
 
 /**

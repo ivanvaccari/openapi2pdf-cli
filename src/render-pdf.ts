@@ -33,7 +33,7 @@ export async function renderPdf(
         headerTemplate: headerHtml,
         footerTemplate: footerHtml,
         displayHeaderFooter: !!(headerHtml || footerHtml),
-
+        timeout: 180000,
         margin: {
             top: "15mm",
             right: "15mm",

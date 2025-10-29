@@ -17,28 +17,61 @@ export class OpenApiV3Render {
     private operationParametersHeaderTemplate: Handlebars.TemplateDelegate;
     private operationResponseTemplate: Handlebars.TemplateDelegate;
     private operationResponseContentTypeTemplate: Handlebars.TemplateDelegate;
+    private tocLineTemplate: Handlebars.TemplateDelegate;
+    private tocTemplate: Handlebars.TemplateDelegate;
+    private apiTemplate: Handlebars.TemplateDelegate;
+    private schemasTemplate: Handlebars.TemplateDelegate;
+    private configFile: ConfigFile;
+    private templates: TemplateFiles;
+    private openApiSpecJson: OpenAPIV3.Document;
 
-    constructor(
-        protected configFile: ConfigFile,
-        protected templates: TemplateFiles,
-        protected openApiSpecJson: OpenAPIV3.Document,
-    ) {
+    constructor(configFile: ConfigFile, templates: TemplateFiles, openApiSpecJson: OpenAPIV3.Document) {
+        this.templates = templates;
+        this.configFile = configFile;
+        this.openApiSpecJson = Object.freeze(openApiSpecJson);
         // prepare some templates to be used during rendering
         this.operationTemplate = Handlebars.compile(this.templates.operation);
         this.operationParametersTemplate = Handlebars.compile(this.templates.operationParameter);
         this.operationParametersHeaderTemplate = Handlebars.compile(this.templates.operationParametersHeader);
         this.operationResponseTemplate = Handlebars.compile(this.templates.operationResponse);
         this.operationResponseContentTypeTemplate = Handlebars.compile(this.templates.operationResponseContentType);
+        this.tocLineTemplate = Handlebars.compile(this.templates.tocLine);
+        this.tocTemplate = Handlebars.compile(this.templates.toc);
+        this.apiTemplate = Handlebars.compile(this.templates.api);
+        this.schemasTemplate = Handlebars.compile(this.templates.schemas);
     }
 
     /**
-     * Gets a schema from a ref
-     * @param ref
-     * @returns
+     *
      */
-    private getSchemaByRef(ref: string): OpenAPIV3.SchemaObject | undefined {
-        const refPath = ref.split("/").slice(1);
-        return _.get(this.openApiSpecJson, refPath);
+    public renderToc(): string {
+        const html: string[] = [];
+
+        for (const path in this.openApiSpecJson.paths) {
+            const pathItem = this.openApiSpecJson.paths[path];
+            // this is only for type checking
+            if (!pathItem) continue;
+            for (const method of ["get", "post", "put", "delete", "patch", "options", "head", "trace"]) {
+                // ignore if the method does not exist on the path item
+                if (!(method in pathItem)) continue;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const operation = (pathItem as any)[method];
+
+                const tocLineHtml = this.tocLineTemplate({
+                    tocLine: {
+                        method: method.toUpperCase(),
+                        path: path,
+                        summary: operation.summary || "",
+                        link: `#${method}-${path.replace(/\//g, "-")}`,
+                    },
+                });
+                html.push(tocLineHtml);
+            }
+        }
+
+        return this.tocTemplate({
+            content: html.join("\n"),
+        });
     }
 
     /**
@@ -197,6 +230,7 @@ export class OpenApiV3Render {
                         parametersHeader: parametersHeaderHtml,
                         responses: responsesHtml,
                     },
+                    anchor: `${method}-${path.replace(/\//g, "-")}`,
                     path: path,
                     method: method.toUpperCase(),
                 });
@@ -205,8 +239,16 @@ export class OpenApiV3Render {
             }
         }
 
-        // Render schemas at the end
-        this.html.push(this.processComponents("schemas"));
-        return this.html.join("\n");
+        const content = this.html.join("\n");
+
+        return this.apiTemplate({ content: content });
+    }
+
+    /**
+     * Render schemas at the end
+     */
+    public renderSchemas(): string {
+        const schemasHtml = this.processComponents("schemas");
+        return this.schemasTemplate({ content: schemasHtml });
     }
 }

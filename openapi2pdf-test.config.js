@@ -1,7 +1,8 @@
 module.exports = {
 
     template: "postman",
-    openApiUrl: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
+    // openapiJsonPath: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
+    openapiJsonPath: "openapi.json",
     metadata:{
         title: "Ably Platform API Documentation",
         description: "Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.",
@@ -36,7 +37,7 @@ module.exports = {
             left: "10mm"
         },
         format: "A4",
-        scale: 0.75
+        scale: 0.70
     },
     outputFiles: {
         pdf: "output/test.pdf",

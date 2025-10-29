@@ -2,12 +2,9 @@ import { program } from "commander";
 import { loadConfigFile } from "./load-config-file";
 import axios from "axios";
 import fs from "fs";
-import {
-    findTemplatePath,
-    loadTemplateFiles,
-    renderHtml,
-} from "./template-utils";
+import { findTemplatePath, loadTemplateFiles, renderHtml } from "./template-utils";
 import { renderPdf } from "./render-pdf";
+import { loadOpenApiJson } from "./lib/load-open-api-json";
 
 /**
  * Main entry point of the tool
@@ -25,24 +22,15 @@ async function run() {
     const configFile = await loadConfigFile(program.opts().config);
 
     // Validate required fields in config file
-    if (!configFile.openApiUrl)
-        throw new Error("openApiUrl is required in config file");
+    if (!configFile.openapiJsonPath) throw new Error("openapiJsonPath is required in config file");
 
     // Find template path
     const templatePath = await findTemplatePath(configFile.template);
 
     // fetch OpenAPI specification
-    console.log(
-        `Fetching OpenAPI specification from ${configFile.openApiUrl}...`,
-    );
-    const openApiSpecRsponse = await axios.get(configFile.openApiUrl);
-    if (openApiSpecRsponse.status !== 200) {
-        throw new Error(
-            `Failed to fetch OpenAPI specification from ${configFile.openApiUrl}, status code: ${openApiSpecRsponse.status}`,
-        );
-    }
-    console.log("OpenAPI specification fetched successfully.");
-    let openApiSpecJson = openApiSpecRsponse.data;
+    console.log(`Loading OpenAPI specification from ${configFile.openapiJsonPath}...`);
+    let openApiSpecJson = await loadOpenApiJson(configFile.openapiJsonPath);
+    console.log("OpenAPI specification loaded successfully.");
 
     // Apply transformation if provided
     if (typeof configFile.transform === "function") {
@@ -79,6 +67,6 @@ async function run() {
 }
 
 run().catch((err) => {
-    console.error(err.message);
+    console.error(err);
     process.exit(1);
 });

@@ -1,12 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
-import { ConfigFile, GenericObject, TemplateFiles } from "./types";
+import { ConfigFile, TemplateFiles } from "./types";
 import Handlebars from "handlebars";
 import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 import _ from "lodash";
-import { marked } from "marked";
-import { sample as OpenApiSampler } from "openapi-sampler";
-import { JsonSchemaRender } from "./lib/json-schema-render";
 import { OpenApiV3Render } from "./lib/open-api-v3-render";
 
 export const templateFilenames: TemplateFiles = {
@@ -24,6 +21,10 @@ export const templateFilenames: TemplateFiles = {
     operationParametersHeader: "operation-parameters-header.hbs",
     operationResponse: "operation-response.hbs",
     operationResponseContentType: "operation-response-content-type.hbs",
+    tocLine: "toc-line.hbs",
+    toc: "toc.hbs",
+    api: "api.hbs",
+    schemas: "schemas.hbs",
 };
 
 /**
@@ -121,22 +122,25 @@ export async function renderHtml(
     // openApiSpecJson = resolveRefs(_.cloneDeep(openApiSpecJson) as OpenAPIV3.Document);
 
     // Generate the handlebars template for the OpenAPI spec
-    let openApiSpectHbs = "";
+    let openApiSpectHtml = "";
+    let tocHtml = "";
+    let schemasHtml = "";
+
     switch (openApiSpecJson.openapi.split(".").slice(0, 2).join(".")) {
-        case "3.0":
-            openApiSpectHbs = new OpenApiV3Render(
-                configFile,
-                templates,
-                openApiSpecJson as OpenAPIV3.Document,
-            ).render();
+        case "3.0": {
+            const r = new OpenApiV3Render(configFile, templates, openApiSpecJson as OpenAPIV3.Document);
+            openApiSpectHtml = r.render();
+            tocHtml = r.renderToc();
+            schemasHtml = r.renderSchemas();
             break;
-        case "3.1":
-            openApiSpectHbs = openApiSpectHbs = new OpenApiV3Render(
-                configFile,
-                templates,
-                openApiSpecJson as OpenAPIV3.Document,
-            ).render();
+        }
+        case "3.1": {
+            const r = new OpenApiV3Render(configFile, templates, openApiSpecJson as OpenAPIV3.Document);
+            openApiSpectHtml = r.render();
+            tocHtml = r.renderToc();
+            schemasHtml = r.renderSchemas();
             break;
+        }
         default:
             throw new Error(`OpenAPI version ${openApiSpecJson.openapi} not supported`);
     }
@@ -155,7 +159,9 @@ export async function renderHtml(
         templates.summary,
         templates.authentication,
         templates.assumptions,
-        openApiSpectHbs,
+        tocHtml,
+        openApiSpectHtml,
+        schemasHtml,
         templates.lastpage,
         "</body>",
         "</html>",
@@ -166,17 +172,17 @@ export async function renderHtml(
 
     const body = template({
         metadata: configFile.metadata,
-        openApiUrl: configFile.openApiUrl,
+        openapiJsonPath: configFile.openapiJsonPath,
     });
 
     const header = Handlebars.compile(templates.header)({
         metadata: configFile.metadata,
-        openApiUrl: configFile.openApiUrl,
+        openapiJsonPath: configFile.openapiJsonPath,
     });
 
     const footer = Handlebars.compile(templates.footer)({
         metadata: configFile.metadata,
-        openApiUrl: configFile.openApiUrl,
+        openapiJsonPath: configFile.openapiJsonPath,
     });
 
     return {

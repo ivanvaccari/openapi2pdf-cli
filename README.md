@@ -15,7 +15,7 @@ Write a configuration file (e.g., `openapi2pdf.config.js`):
 
 ```javascript
 module.exports = {
-    openApiUrl: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
+    openapiJsonPath: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
     ouputFiles: {
         pdf: "output/documentation.pdf",
         html: "output/documentation.html"
