@@ -58,12 +58,12 @@ export class OpenApiV3Render {
                 const operation = (pathItem as any)[method];
 
                 const tocLineHtml = this.tocLineTemplate({
-                    tocLine: {
+                   
                         method: method.toUpperCase(),
                         path: path,
                         summary: operation.summary || "",
                         link: `#${method}-${path.replace(/\//g, "-")}`,
-                    },
+                    
                 });
                 html.push(tocLineHtml);
             }

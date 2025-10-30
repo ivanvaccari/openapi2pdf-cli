@@ -1,4 +1,17 @@
-<div class="operation" id="{{operation.anchor}}">
+<!--
+Available variables:
+- anchor: the HTML anchor for this operation
+- method: HTTP method (GET, POST, etc.)
+- path: the API path (e.g., /users/{id})
+- operation
+   - summary: brief description of the operation
+   - description: detailed description of the operation (in HTML)
+   - parametersHeader: pre-rendered HTML for the parameters header
+   - parameters: pre-rendered HTML for the parameters block
+   - responses: pre-rendered HTML for the responses block
+-->
+
+<div class="operation" id="{{anchor}}">
     <div class="operation-header">
         <div class="operation-method {{method}}">{{method}}</div>
         <div class="operation-path">{{path}}</div>

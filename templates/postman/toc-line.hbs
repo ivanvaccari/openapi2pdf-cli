@@ -1,3 +1,15 @@
+<!-- avalable vars:
+
+- method: HTTP method (GET, POST, etc.)
+- path: API endpoint path
+- summary: Brief description of the operation
+- link: Anchor link to the operation details section
+-->
+
 <div class="toc-line">
-    <a href="#{{link}}">{{method}} {{path}} {{summary}}</a>
+    <a href="{{link}}">
+        <div class="toc-method">{{method}}</div>
+        <div class="toc-path">{{path}}</div>
+    </a>
+    <div class="toc-summary">{{summary}}</div>
 </div>

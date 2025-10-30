@@ -96,8 +96,6 @@ h4 {
 
 .operation {
     margin-bottom: 20px;
-    padding: 10px;
-
 }
 
 .operation-header {
@@ -303,11 +301,29 @@ pre {
     font-weight: bold;
 }
 
+.sub-schema .schema .schema-header .schema-title {
+    font-size: var(--size-h4);
+} 
+
 .schema .schema-properties-header {
     margin-top: 8px;
     font-weight: bold;
     font-size: var(--size-h3);
 }
+
+.schema .schema-sub-properties-header {
+    margin-top: 8px;
+    font-weight: bold;
+    font-size: var(--size-h4);
+}
+
+.properties-padder {
+    margin-left: 10px;
+    padding-left: 10px;
+    margin-top: 10px;
+    border-left: 2px solid var(--border-light);
+}
+
 
 .schema .schema-properties {
     margin-top: 4px;
@@ -359,3 +375,27 @@ pre {
 .schema .schema-sample {
     margin-top: 8px;
 }
+
+
+
+.toc-line {
+}
+
+.toc-line a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.toc-line .toc-method {
+    width: 80px;
+}
+
+.toc-line .toc-summary {
+    margin-left: 80px;
+    color: var(--text-color-description);
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
