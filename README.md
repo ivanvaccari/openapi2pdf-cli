@@ -17,6 +17,17 @@ To use this script, you need:
 - An OpenAPI v3.x specification (either local file or URL)
 - A configuration file `openapi2pdf.config.js`to customize the output
 
+### Installation
+
+```bash
+git clone https://github.com/ivanvaccari/openapi2pdf-cli
+cd openapi2pdf-cli
+npm install
+npm run build
+```
+
+### Run the generator
+
 To run the tool, use the following command:
 
 ```bash
@@ -73,9 +84,8 @@ You can use the `postman` template as a starting point to create your own custom
 
 All template files are mandatory. If you don't want to render a specific section, create an empty file.
 
-
-
 ## Examples
+
 See the [samples](./samples) directory for example configuration file and generated documentation.
 
 - [./samples/openapi2pdf.config.js](./samples/openapi2pdf.config.js)

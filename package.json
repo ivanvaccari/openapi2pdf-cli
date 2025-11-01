@@ -1,35 +1,36 @@
 {
-  "name": "openapi2pdf2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "tsc && node dist/index.js --config openapi2pdf-test.config.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@types/lodash": "^4.17.20",
-    "@types/node": "^22.16.0",
-    "axios": "^1.12.2",
-    "commander": "^14.0.1",
-    "handlebars": "^4.7.8",
-    "lodash": "^4.17.21",
-    "marked": "^16.4.1",
-    "openapi-sampler": "^1.6.2",
-    "openapi-types": "^12.1.3",
-    "puppeteer": "^24.26.1",
-    "sass": "^1.93.3",
-    "typescript": "^5.9.3"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.38.0",
-    "@eslint/json": "^0.13.2",
-    "eslint": "^9.38.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^16.4.0",
-    "jiti": "^2.6.1",
-    "prettier": "3.6.2",
-    "typescript-eslint": "^8.46.2"
-  }
+    "name": "openapi2pdf-cli",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "tsc && node dist/index.js --config openapi2pdf-test.config.js",
+        "build": "tsc"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/lodash": "^4.17.20",
+        "@types/node": "^22.16.0",
+        "axios": "^1.12.2",
+        "commander": "^14.0.1",
+        "handlebars": "^4.7.8",
+        "lodash": "^4.17.21",
+        "marked": "^16.4.1",
+        "openapi-sampler": "^1.6.2",
+        "openapi-types": "^12.1.3",
+        "puppeteer": "^24.26.1",
+        "sass": "^1.93.3",
+        "typescript": "^5.9.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.38.0",
+        "@eslint/json": "^0.13.2",
+        "eslint": "^9.38.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^16.4.0",
+        "jiti": "^2.6.1",
+        "prettier": "3.6.2",
+        "typescript-eslint": "^8.46.2"
+    }
 }
