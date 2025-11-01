@@ -144,7 +144,7 @@ export type GenericObject = {
 
 export type TemplateFiles = {
     /**
-     * Css style to be applied to the document
+     * Css style to be applied to the document. This content is compiled with sass before use, so it can use sass features.
      */
     style: string;
 
@@ -199,11 +199,6 @@ export type TemplateFiles = {
     operationParameter: string;
 
     /**
-     * Header template for operation parameters section
-     */
-    operationParametersHeader: string;
-
-    /**
      * Template for operation response
      */
     operationResponse: string;
@@ -222,6 +217,11 @@ export type TemplateFiles = {
      * Table of contents template
      */
     toc: string;
+
+    /**
+     * Template for the toc tag
+     */
+    tocTag: string;
 
     /**
      * Template for the api page

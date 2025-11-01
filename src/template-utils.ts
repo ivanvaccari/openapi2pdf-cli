@@ -5,9 +5,10 @@ import Handlebars from "handlebars";
 import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 import _ from "lodash";
 import { OpenApiV3Render } from "./lib/open-api-v3-render";
+import { compile } from "sass";
 
 export const templateFilenames: TemplateFiles = {
-    style: "style.css",
+    style: "style.scss",
     header: "header.hbs",
     footer: "footer.hbs",
     frontpage: "frontpage.hbs",
@@ -18,13 +19,13 @@ export const templateFilenames: TemplateFiles = {
     authentication: "authentication.hbs",
     operation: "operation.hbs",
     operationParameter: "operation-parameter.hbs",
-    operationParametersHeader: "operation-parameters-header.hbs",
     operationResponse: "operation-response.hbs",
     operationResponseContentType: "operation-response-content-type.hbs",
     tocLine: "toc-line.hbs",
     toc: "toc.hbs",
     api: "api.hbs",
     schemas: "schemas.hbs",
+    tocTag: "toc-tag.hbs",
 };
 
 /**
@@ -64,11 +65,21 @@ export async function findTemplatePath(templatePath?: string): Promise<string> {
 export async function loadTemplateFiles(templatePath: string): Promise<TemplateFiles> {
     const templates: TemplateFiles = { ...templateFilenames };
 
+    const _loadFile = async (filename: string): Promise<string> => {
+        return fs.readFile(path.join(templatePath, filename)).then((data) => data.toString());
+    };
+
     // load the templates
     for (const _key in templates) {
         const key = _key as keyof TemplateFiles;
-        templates[key] = await fs.readFile(path.join(templatePath, templates[key])).then((data) => data.toString());
+
+        // Ignore style here, it will be processed later
+        if (key === "style") continue;
+        templates[key] = await _loadFile(templates[key]);
     }
+
+    // Use sass to compile style.scss to css
+    templates.style = compile(path.join(templatePath, templates.style)).css;
 
     templatePath = templatePath.replace(/\//g, "\\");
 
@@ -129,16 +140,16 @@ export async function renderHtml(
     switch (openApiSpecJson.openapi.split(".").slice(0, 2).join(".")) {
         case "3.0": {
             const r = new OpenApiV3Render(configFile, templates, openApiSpecJson as OpenAPIV3.Document);
-            openApiSpectHtml = r.render();
-            tocHtml = r.renderToc();
-            schemasHtml = r.renderSchemas();
+            openApiSpectHtml = await r.render();
+            tocHtml = await r.renderToc();
+            schemasHtml = await r.renderSchemas();
             break;
         }
         case "3.1": {
             const r = new OpenApiV3Render(configFile, templates, openApiSpecJson as OpenAPIV3.Document);
-            openApiSpectHtml = r.render();
-            tocHtml = r.renderToc();
-            schemasHtml = r.renderSchemas();
+            openApiSpectHtml = await r.render();
+            tocHtml = await r.renderToc();
+            schemasHtml = await r.renderSchemas();
             break;
         }
         default:

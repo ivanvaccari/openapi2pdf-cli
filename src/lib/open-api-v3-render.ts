@@ -14,13 +14,13 @@ export class OpenApiV3Render {
     private html: string[] = [];
     private operationTemplate: Handlebars.TemplateDelegate;
     private operationParametersTemplate: Handlebars.TemplateDelegate;
-    private operationParametersHeaderTemplate: Handlebars.TemplateDelegate;
     private operationResponseTemplate: Handlebars.TemplateDelegate;
     private operationResponseContentTypeTemplate: Handlebars.TemplateDelegate;
     private tocLineTemplate: Handlebars.TemplateDelegate;
     private tocTemplate: Handlebars.TemplateDelegate;
     private apiTemplate: Handlebars.TemplateDelegate;
     private schemasTemplate: Handlebars.TemplateDelegate;
+    private tocTagTemplate: Handlebars.TemplateDelegate;
     private configFile: ConfigFile;
     private templates: TemplateFiles;
     private openApiSpecJson: OpenAPIV3.Document;
@@ -32,9 +32,9 @@ export class OpenApiV3Render {
         // prepare some templates to be used during rendering
         this.operationTemplate = Handlebars.compile(this.templates.operation);
         this.operationParametersTemplate = Handlebars.compile(this.templates.operationParameter);
-        this.operationParametersHeaderTemplate = Handlebars.compile(this.templates.operationParametersHeader);
         this.operationResponseTemplate = Handlebars.compile(this.templates.operationResponse);
         this.operationResponseContentTypeTemplate = Handlebars.compile(this.templates.operationResponseContentType);
+        this.tocTagTemplate = Handlebars.compile(this.templates.tocTag);
         this.tocLineTemplate = Handlebars.compile(this.templates.tocLine);
         this.tocTemplate = Handlebars.compile(this.templates.toc);
         this.apiTemplate = Handlebars.compile(this.templates.api);
@@ -42,9 +42,10 @@ export class OpenApiV3Render {
     }
 
     /**
-     *
+     * Renders the Table of Contents section
      */
-    public renderToc(): string {
+    public async renderToc(): Promise<string> {
+        const htmlByTag: { [tag: string]: string[] } = {};
         const html: string[] = [];
 
         for (const path in this.openApiSpecJson.paths) {
@@ -58,15 +59,42 @@ export class OpenApiV3Render {
                 const operation = (pathItem as any)[method];
 
                 const tocLineHtml = this.tocLineTemplate({
-                   
-                        method: method.toUpperCase(),
-                        path: path,
-                        summary: operation.summary || "",
-                        link: `#${method}-${path.replace(/\//g, "-")}`,
-                    
+                    method: method.toUpperCase(),
+                    path: path,
+                    summary: operation.summary || "",
+                    link: `#${method}-${path.replace(/\//g, "-")}`,
                 });
-                html.push(tocLineHtml);
+
+                operation.tags = operation.tags || [""];
+                for (const tag of operation.tags) {
+                    if (!htmlByTag[tag]) {
+                        htmlByTag[tag] = [];
+                    }
+                    htmlByTag[tag].push(tocLineHtml);
+                }
             }
+        }
+
+
+        const usedTags = Object.keys(htmlByTag).sort();
+        for (const tag of usedTags) {
+            let tagSpec = this.openApiSpecJson.tags?.find((t) => t.name === tag);
+            if (!tagSpec) {
+                // no tag, use a fake one
+                tagSpec = { name: tag, description: "" };
+            }
+
+            let description: string = tagSpec.description ? await marked.parseInline(tagSpec.description) : "";
+            if (tagSpec.externalDocs) {
+                description += ` <a href="${tagSpec.externalDocs.url}">${tagSpec.externalDocs.description} ${tagSpec.externalDocs.url}</a>`;
+            }
+
+            const tagHtml = this.tocTagTemplate({
+                title: tagSpec.name,
+                description: description,
+                lines: htmlByTag[tag],
+            });
+            html.push(tagHtml);
         }
 
         return this.tocTemplate({
@@ -80,7 +108,7 @@ export class OpenApiV3Render {
      * @param parameter the parameter object
      * @returns
      */
-    private preprocessParameter(parameter: OpenAPIV3.ParameterObject): object {
+    private async preprocessParameter(parameter: OpenAPIV3.ParameterObject): Promise<object> {
         const schema: OpenAPIV3.SchemaObject | undefined = parameter.schema
             ? _.cloneDeep(parameter.schema as OpenAPIV3.SchemaObject)
             : undefined;
@@ -90,7 +118,7 @@ export class OpenApiV3Render {
         return {
             parameter: {
                 ...parameter,
-                description: parameter.description ? marked.parseInline(parameter.description || "") : undefined,
+                description: parameter.description ? await marked.parseInline(parameter.description || "") : undefined,
                 type: type,
                 isArray: type === "array",
                 schema:
@@ -104,17 +132,17 @@ export class OpenApiV3Render {
     /**
      *
      */
-    private processComponents(where: "schemas"): string {
+    private async processComponents(where: "schemas"): Promise<string> {
         const schemaHtmlLines: string[] = [];
-        Object.keys(this.openApiSpecJson.components?.[where] ?? {}).forEach((schemaName) => {
+        for (const schemaName of Object.keys(this.openApiSpecJson.components?.[where] ?? {})) {
             const schema = this.openApiSpecJson.components?.[where]?.[schemaName];
 
             if (schema) {
                 const link = "#/components/schemas/" + schemaName;
-                const schemaHtml = new JsonSchemaRender(schemaName, link, schema, this.openApiSpecJson).render();
+                const schemaHtml = await new JsonSchemaRender(schemaName, link, schema, this.openApiSpecJson).render();
                 schemaHtmlLines.push(schemaHtml);
             }
-        });
+        }
 
         return schemaHtmlLines.join("\n");
     }
@@ -125,9 +153,10 @@ export class OpenApiV3Render {
      * @param operation the operation object
      * @param operationParametersTemplate the template to be used for each parameter
      */
-    private processParameters(operation: OpenAPIV3.OperationObject) {
+    private async processParameters(operation: OpenAPIV3.OperationObject): Promise<string[] | undefined> {
         // process the parameters. this will produce an
         const parametersHtml: string[] = [];
+
         if (operation.parameters && Array.isArray(operation.parameters)) {
             for (let parameter of operation.parameters) {
                 // Resolve ref if needed
@@ -137,20 +166,20 @@ export class OpenApiV3Render {
                 }
 
                 const parameterHtml = this.operationParametersTemplate(
-                    this.preprocessParameter(parameter as OpenAPIV3.ParameterObject),
+                    await this.preprocessParameter(parameter as OpenAPIV3.ParameterObject),
                 );
                 parametersHtml.push(parameterHtml);
             }
         }
 
-        return parametersHtml.length > 0 ? parametersHtml.join("\n") : undefined;
+        return parametersHtml.length > 0 ? parametersHtml : undefined;
     }
 
     /**
      * Process the responses for an operation
      *
      */
-    private processResponses(operation: OpenAPIV3.OperationObject) {
+    private async processResponses(operation: OpenAPIV3.OperationObject): Promise<string[] | undefined> {
         const responsesHtml: string[] = [];
 
         if (operation.responses) {
@@ -164,7 +193,7 @@ export class OpenApiV3Render {
                         let contentSchema: string | undefined;
                         try {
                             contentSchema = content.schema
-                                ? new JsonSchemaRender("", "", content.schema, this.openApiSpecJson).render()
+                                ? await new JsonSchemaRender("", "", content.schema, this.openApiSpecJson).render()
                                 : undefined;
                         } catch (err) {
                             console.error(
@@ -185,7 +214,7 @@ export class OpenApiV3Render {
                     response: {
                         code: statusCode,
                         description: responseForStatuscode.description
-                            ? marked.parseInline(responseForStatuscode.description)
+                            ? await marked.parseInline(responseForStatuscode.description)
                             : undefined,
                         content: contentTypesHtml.length > 0 ? contentTypesHtml.join("\n") : undefined,
                     },
@@ -195,14 +224,14 @@ export class OpenApiV3Render {
             }
         }
 
-        return responsesHtml.length > 0 ? responsesHtml.join("\n") : undefined;
+        return responsesHtml.length > 0 ? responsesHtml : undefined;
     }
 
     /**
      *
      * @returns
      */
-    public render() {
+    public async render() {
         // Start rendering operations
         for (const path in this.openApiSpecJson.paths) {
             const pathItem = this.openApiSpecJson.paths[path];
@@ -216,18 +245,15 @@ export class OpenApiV3Render {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const operation = (pathItem as any)[method];
 
-                // render parameters header html
-                const parametersHeaderHtml = this.operationParametersHeaderTemplate({});
                 // render parameters html
-                const parametersHtml = this.processParameters(operation);
+                const parametersHtml = await this.processParameters(operation);
                 // render responses html
-                const responsesHtml = this.processResponses(operation);
+                const responsesHtml = await this.processResponses(operation);
 
                 const operationHtml = this.operationTemplate({
                     operation: {
                         ...operation,
                         parameters: parametersHtml,
-                        parametersHeader: parametersHeaderHtml,
                         responses: responsesHtml,
                     },
                     anchor: `${method}-${path.replace(/\//g, "-")}`,
@@ -247,8 +273,8 @@ export class OpenApiV3Render {
     /**
      * Render schemas at the end
      */
-    public renderSchemas(): string {
-        const schemasHtml = this.processComponents("schemas");
+    public async renderSchemas(): Promise<string> {
+        const schemasHtml = await this.processComponents("schemas");
         return this.schemasTemplate({ content: schemasHtml });
     }
 }

@@ -59,7 +59,7 @@ export class JsonSchemaRender {
     /**
      *
      */
-    private iterate(name: string, link: string, schemaOrReference: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject) {
+    private async iterate(name: string, link: string, schemaOrReference: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject) {
         if ((schemaOrReference as OpenAPIV3.ReferenceObject).$ref) {
             const ref = (schemaOrReference as OpenAPIV3.ReferenceObject).$ref;
             const schemaName = this.getSchemaNameByRef(ref);
@@ -75,7 +75,10 @@ export class JsonSchemaRender {
             for (let i = 0; i < schema.oneOf.length; i++) {
                 const oneSchema = schema.oneOf[i];
                 if (!oneSchema) continue;
+                this.html.push(`<div class='schema-oneof-index'>Option ${i + 1}:</div>`);
+                this.html.push("<div class='schema-oneof'>");
                 this.iterate("", "", oneSchema);
+                this.html.push("</div>");
             }
             return;
         }
@@ -87,7 +90,7 @@ export class JsonSchemaRender {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             sample = JSON.stringify(OpenApiSampler(schema as any, {}, this.schema), null, 2);
         } catch (error: any) {
-            console.error("Error generating sample for schema ", name, error?.message);
+            console.error("Error generating sample for schema", name, error?.message);
             sample = "";
         }
 
@@ -103,63 +106,9 @@ export class JsonSchemaRender {
 
         // Render properties
         if (Object.keys(schema.properties ?? {}).length > 0) {
-            this.renderProperties(0, schema);
+            await this.renderProperties(0, schema);
         }
-        /*
-            this.html.push("<div class='schema-properties-header'>Properties</div>");
-            this.html.push("<div class='schema-properties'>");
-            for (const propertyName in schema.properties) {
-                const propertySchema = schema.properties[propertyName];
-                if (!propertySchema) continue;
-
-                const propertySchemaRef = propertySchema as OpenAPIV3.ReferenceObject;
-                const propertySchemaObj = propertySchema as OpenAPIV3.SchemaObject;
-                const isRef = !!propertySchemaRef.$ref;
-                const format = propertySchemaObj.format ? ` (format: ${propertySchemaObj.format})` : "";
-
-                this.html.push("<div class='schema-property'>");
-                this.html.push(`<div class='schema-property-name'>${propertyName}</div>`);
-                this.html.push(
-                    `<div class='schema-property-required'>${schema.required && schema.required.includes(propertyName) ? "(required)" : ""}</div>`,
-                );
-
-                this.html.push(`<div class='schema-property-type'>${isRef ? "" : propertySchemaObj.type} ${format}</div>`);
-
-                this.html.push(`<div class='schema-property-description-container'>`);
-
-                if (isRef) {
-                    const restOfObject = _.omit(propertySchemaRef, ["type", "description", "format", "$ref"]);
-                    const schema = this.getSchemaByRef(propertySchemaRef.$ref);
-                    const schemaName = this.getSchemaNameByRef(propertySchemaRef.$ref);
-                    this.html.push(
-                        `<div class='schema-property-description'>${schema?.description ? marked.parseInline(schema?.description) : ""}<br><br>See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a></div>`,
-                    );
-
-                    if (Object.keys(restOfObject).length > 0) {
-                        this.html.push("<div class='schema-property-schema'><pre>");
-                        this.html.push(this.escapeHtml(JSON.stringify(restOfObject, null, 2)));
-                        this.html.push("</pre></div>"); // end of schema-property-schema
-                    }
-                } else {
-                    
-                    this.html.push(
-                        `<div class='schema-property-description'>${isRef ? "" : marked.parseInline(propertySchemaObj.description ?? "No description")}</div>`,
-                    );
-
-                    const restOfObject = _.omit(propertySchemaObj, ["type", "description","format"]);
-                    if (Object.keys(restOfObject).length > 0) {
-                        this.html.push("<div class='schema-property-schema'><pre>");
-                        this.html.push(this.escapeHtml(JSON.stringify(_.omit(propertySchemaObj, ["type", "description"]), null, 2)));
-                        this.html.push("</pre></div>"); // end of schema-property-schema
-                    }
-                }
-
-                this.html.push(`</div>`); // end of schema-property-description-container
-                this.html.push("</div>"); // end of schema-property
-            }
-            this.html.push("</div>");
-        }*/
-
+        
         // end of "schema"
         this.html.push("</div>");
     }
@@ -169,7 +118,7 @@ export class JsonSchemaRender {
      * @param schema
      * @returns
      */
-    private renderProperties(level: number, schema?: OpenAPIV3.SchemaObject) {
+    private async renderProperties(level: number, schema?: OpenAPIV3.SchemaObject) {
         if (!schema) return;
         if (Object.keys(schema?.properties || {}).length === 0) return;
 
@@ -203,7 +152,7 @@ export class JsonSchemaRender {
                 const schema = this.getSchemaByRef(propertySchemaRef.$ref);
                 const schemaName = this.getSchemaNameByRef(propertySchemaRef.$ref);
                 this.html.push(
-                    `<div class='schema-property-description'>${schema?.description ? marked.parseInline(schema?.description) : ""}<br><br>See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a></div>`,
+                    `<div class='schema-property-description'>${schema?.description ? (await marked.parseInline(schema?.description)) : ""}<br><br>See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a></div>`,
                 );
 
                 if (Object.keys(restOfObject).length > 0) {
@@ -213,7 +162,7 @@ export class JsonSchemaRender {
                 }
             } else {
                 this.html.push(
-                    `<div class='schema-property-description'>${isRef ? "" : marked.parseInline(propertySchemaObj.description ?? "No description")}</div>`,
+                    `<div class='schema-property-description'>${isRef ? "" : (await marked.parseInline(propertySchemaObj.description ?? "No description"))}</div>`,
                 );
 
                 const subProperties = propertySchemaObj.properties;
@@ -260,9 +209,9 @@ export class JsonSchemaRender {
      * @param schema the schema to render
      * @returns the rendered HTML
      */
-    public render(): string {
+    public async render(): Promise<string> {
         // Render the schema using the fullSchema context
-        this.iterate(this.name, this.link, this.schema);
+        await this.iterate(this.name, this.link, this.schema);
 
         return this.html.join("\n");
     }

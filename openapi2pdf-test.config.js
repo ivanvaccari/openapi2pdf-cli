@@ -1,8 +1,9 @@
 module.exports = {
 
     template: "postman",
-    // openapiJsonPath: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
-    openapiJsonPath: "openapi.json",
+    openapiJsonPath: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
+    // openapiJsonPath: "https://gist.githubusercontent.com/biggates/4955d608379a8b1b3224e815c7dd0dc9/raw/0f69ccfb49181f17f2e2c1f5caedc345f1f40af5/petstore_oas3_requestBody_example.json",
+    //openapiJsonPath: "openapi.json",
     metadata:{
         title: "Ably Platform API Documentation",
         description: "Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.Comprehensive documentation for the Ably Platform API, generated from the OpenAPI specification.",

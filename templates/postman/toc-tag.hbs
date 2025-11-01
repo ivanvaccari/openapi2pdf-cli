@@ -1,0 +1,25 @@
+<!-- 
+
+Toc "tag" or "group" template. this mostly separates lines in groups where the title is the
+openapi api tag and tag summary
+
+Avalable vars:
+- title: the tag title
+- description: the tag description (in HTML)
+- lines: array of pre-rendered toc lines (HTML)
+
+-->
+
+<div class="toc-tag">
+    <h4>{{title}}</h4>
+    <div class="toc-tag-description">
+        {{{description}}}
+    </div>
+
+    <div class="toc-lines">
+        <!-- this is a pre-rendered array of toc lines  -->
+        {{#each lines}}
+            {{{this}}}
+        {{/each}}
+    </div>
+</div>

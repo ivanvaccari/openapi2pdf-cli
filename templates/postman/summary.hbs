@@ -1,3 +1,12 @@
+<!-- 
+Summary page template.
+
+Available variables:
+- metadata: the full object from the "metadata" field in the config file
+- openapiJsonPath: the path to the OpenAPI JSON file
+
+-->
+
 <div class='summary-page'>
     <h2>Summary</h2>
     <div class="server-info">
@@ -6,12 +15,12 @@
             <b>Webserver url</b>: {{metadata.host}}<br><br>
         {{/if}}
 
-        {{#if metadata.swagger}}
+        {{#if metadata.swaggerUrl}}
             <b><a href='https://swagger.io/'>Swagger</a> UI</b>: {{metadata.swaggerUrl}}<br><br>
         {{/if}}
 
         
-        <b><a href='https://swagger.io/specification/'>OpenAPI</a> JSON</b>: {{openapuUrl}}<br><br>
+        <b><a href='https://swagger.io/specification/'>OpenAPI</a> JSON</b>: {{openapiJsonPath}}<br><br>
         
     </div>
 </div>
