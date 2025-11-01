@@ -3,9 +3,9 @@ import path from "path";
 import { ConfigFile, TemplateFiles } from "./types";
 import Handlebars from "handlebars";
 import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
-import _ from "lodash";
 import { OpenApiV3Render } from "./lib/open-api-v3-render";
 import { compile } from "sass";
+import { OpenApiV3_1Render } from "./lib/open-api-v3_1-render";
 
 export const templateFilenames: TemplateFiles = {
     style: "style.scss",
@@ -45,14 +45,20 @@ export async function findTemplatePath(templatePath?: string): Promise<string> {
     try {
         await fs.stat(_tmp);
         return _tmp;
-    } catch (err) {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+        // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
+    }
 
     // try to find template in built-in templates directory
     _tmp = path.join(__dirname, "../templates/", templatePath);
     try {
         await fs.stat(_tmp);
         return _tmp;
-    } catch (err) {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+        // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
+    }
 
     throw new Error(`Template ${templatePath} not found in cwd() or built-in templates`);
 }
@@ -146,7 +152,7 @@ export async function renderHtml(
             break;
         }
         case "3.1": {
-            const r = new OpenApiV3Render(configFile, templates, openApiSpecJson as OpenAPIV3.Document);
+            const r = new OpenApiV3_1Render(configFile, templates, openApiSpecJson as OpenAPIV3_1.Document);
             openApiSpectHtml = await r.render();
             tocHtml = await r.renderToc();
             schemasHtml = await r.renderSchemas();

@@ -1,10 +1,10 @@
 import { program } from "commander";
-import { loadConfigFile } from "./load-config-file";
-import axios from "axios";
+import { loadConfigFile, mergeConfigFileMetadata } from "./config-file";
 import fs from "fs";
 import { findTemplatePath, loadTemplateFiles, renderHtml } from "./template-utils";
 import { renderPdf } from "./render-pdf";
 import { loadOpenApiJson } from "./lib/load-open-api-json";
+import { mergeConfig } from "axios";
 
 /**
  * Main entry point of the tool
@@ -19,7 +19,7 @@ async function run() {
     }
 
     // Load configuration file
-    const configFile = await loadConfigFile(program.opts().config);
+    let configFile = await loadConfigFile(program.opts().config);
 
     // Validate required fields in config file
     if (!configFile.openapiJsonPath) throw new Error("openapiJsonPath is required in config file");
@@ -31,6 +31,9 @@ async function run() {
     console.log(`Loading OpenAPI specification from ${configFile.openapiJsonPath}...`);
     let openApiSpecJson = await loadOpenApiJson(configFile.openapiJsonPath);
     console.log("OpenAPI specification loaded successfully.");
+
+    // Merge some metadata from OpenAPI spec if not provided in config file
+    configFile = mergeConfigFileMetadata(configFile, openApiSpecJson);
 
     // Apply transformation if provided
     if (typeof configFile.transform === "function") {

@@ -11,19 +11,13 @@ A cli tool to generate PDF documentation from OpenAPI specifications using custo
 
 ## Usage
 
-Write a configuration file (e.g., `openapi2pdf.config.js`):
+To use this script, you need:
 
-```javascript
-module.exports = {
-    openapiJsonPath: "https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json",
-    ouputFiles: {
-        pdf: "output/documentation.pdf",
-        html: "output/documentation.html"
-    }
-}
-```
+- a Node.js environment
+- An OpenAPI v3.x specification (either local file or URL)
+- A configuration file `openapi2pdf.config.js`to customize the output
 
-then run the tool:
+To run the tool, use the following command:
 
 ```bash
 node dist/index.js --config openapi2pdf.config.js
@@ -31,30 +25,56 @@ node dist/index.js --config openapi2pdf.config.js
 
 You will find the generated documentation in the specified output files.
 
+NOTE: Depending on the size of the OpenAPI specification, the generation process may take some time. Let it run.
+
 ## Configuration file
 
-This tool supports readong `json` and `js` configuration files.
+This tool supports reading `json` and `js` configuration files.
 
 `Js` files should export the [ConfigFile](./src/types.ts) object:
+
 ```javascript
 module.exports = {
     // options
-}
+};
 ```
 
-`json` files directly contain the [ConfigFile](./src/types.ts) object:
+`json` files directly contain the [ConfigFile](./src/types.ts) object.
 
-The full set of available options is describet in [ConfigFile type](./src/types.ts) file.
-
+See an example configuration file here: [samples\openapi2pdf-test.config.js](./samples/openapi2pdf-test.config.js). The full set of available options is describet in [ConfigFile type](./src/types.ts) file.
 
 ## Templates
 
-The tool uses Handlebars templates to generate the documentation. You can provide your own templates by specifying the `template` option in the configuration file. The value should be the path to a directory (local to cwd()) containing the following files:
+This tool uses handlebars templates to generate the documentation. The template is composed of multiple files, each one responsible for rendering a specific section of the documentation.
 
-TODO
+This tool provides a built-in template named `postman`, which is inspired by the Postman documentation style. To use the built-in template, you don't need to specify any template in the configuration file, otherwise you can use the configuration file option `template` to specify your own template directory.
 
-If the tool does not find the specified files in the template directory, it will search for them in the built-in template directory.
+The template directory must contain the following files:
 
-All files are mandatory, if you don't want to skip the render of the specified section, create an empty file.
+- `api.hbs`: temlpate for the "Rest Api" page, which includes all the operations
+- `assumptions.hbs`: template for the "Assumptions" page, that you can use to describe any assumption made in the API design or to add custom notes after the `frontpage.hbs` content.
+- `frontpage.hbs`: template for the front page of the documentation, that usually contains the title, description and other general information about the API.
+- `header.hbs`: template for the header of each page
+- `footer.hbs`: template for the footer of each page
+- `lastpage.hbs`: template for the last page of the documentation, that usually contains contact information or other notes.
+- `operation.hbs`: template for each operation (endpoint) of the API
+- `operation-parameter.hbs`: template for each parameter of an operation
+- `operation-response.hbs`: template for each response of an operation
+- `operation-response-content-type.hbs`: template for each content type of a response
+- `style.scss`: stylesheet for the documentation.
+- `toc.hbs`: template for the table of contents
+- `toc-line.hbs`: template for each line of the table of contents
+- `toc-tag.hbs`: template for each tag section in the table of contents
+- `schemas.hbs`: template for the schemas section of the documentation
+- `summary.hbs`: template for the summary page of the documentation
+- `revisions.hbs`: template for the revisions page of the documentation
 
-If you don't provide a template, the built-in `postman` template will be used.
+You can use the `postman` template as a starting point to create your own custom templates.
+
+All template files are mandatory. If you don't want to render a specific section, create an empty file.
+
+
+
+## Examples
+See the [samples](./samples) directory for example configuration files and generated documentation.
+

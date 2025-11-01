@@ -3,6 +3,7 @@ Summary page template.
 
 Available variables:
 - metadata: the full object from the "metadata" field in the config file
+
 - openapiJsonPath: the path to the OpenAPI JSON file
 
 -->
@@ -11,8 +12,11 @@ Available variables:
     <h2>Summary</h2>
     <div class="server-info">
         
-        {{#if metadata.host}}
-            <b>Webserver url</b>: {{metadata.host}}<br><br>
+        {{#if metadata.servers?}}
+            <b>Epi endpoints</b>: <br>
+            {{#each metadata.servers}}
+                 - {{this.url}}<br>
+            {{/each}}
         {{/if}}
 
         {{#if metadata.swaggerUrl}}

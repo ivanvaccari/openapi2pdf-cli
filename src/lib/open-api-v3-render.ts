@@ -75,7 +75,6 @@ export class OpenApiV3Render {
             }
         }
 
-
         const usedTags = Object.keys(htmlByTag).sort();
         for (const tag of usedTags) {
             let tagSpec = this.openApiSpecJson.tags?.find((t) => t.name === tag);

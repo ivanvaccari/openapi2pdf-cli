@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { OpenAPIV3 } from "openapi-types";
+import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 import { sample as OpenApiSampler } from "openapi-sampler";
 import { marked } from "marked";
 
@@ -18,8 +18,8 @@ export class JsonSchemaRender {
     constructor(
         protected name: string,
         protected link: string,
-        protected schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
-        protected openApiSpecJson: OpenAPIV3.Document<{}>,
+        protected schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject,
+        protected openApiSpecJson: OpenAPIV3.Document<object> | OpenAPIV3_1.Document<object>,
     ) {
         // this.fullSchemaWithResolvedRefs = this.resolveRefs(openApiSpecJson);
         this.html = [];
@@ -59,7 +59,11 @@ export class JsonSchemaRender {
     /**
      *
      */
-    private async iterate(name: string, link: string, schemaOrReference: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject) {
+    private async iterate(
+        name: string,
+        link: string,
+        schemaOrReference: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject,
+    ) {
         if ((schemaOrReference as OpenAPIV3.ReferenceObject).$ref) {
             const ref = (schemaOrReference as OpenAPIV3.ReferenceObject).$ref;
             const schemaName = this.getSchemaNameByRef(ref);
@@ -89,6 +93,7 @@ export class JsonSchemaRender {
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             sample = JSON.stringify(OpenApiSampler(schema as any, {}, this.schema), null, 2);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Error generating sample for schema", name, error?.message);
             sample = "";
@@ -108,7 +113,7 @@ export class JsonSchemaRender {
         if (Object.keys(schema.properties ?? {}).length > 0) {
             await this.renderProperties(0, schema);
         }
-        
+
         // end of "schema"
         this.html.push("</div>");
     }
@@ -152,7 +157,7 @@ export class JsonSchemaRender {
                 const schema = this.getSchemaByRef(propertySchemaRef.$ref);
                 const schemaName = this.getSchemaNameByRef(propertySchemaRef.$ref);
                 this.html.push(
-                    `<div class='schema-property-description'>${schema?.description ? (await marked.parseInline(schema?.description)) : ""}<br><br>See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a></div>`,
+                    `<div class='schema-property-description'>${schema?.description ? await marked.parseInline(schema?.description) : ""}<br><br>See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a></div>`,
                 );
 
                 if (Object.keys(restOfObject).length > 0) {
@@ -162,7 +167,7 @@ export class JsonSchemaRender {
                 }
             } else {
                 this.html.push(
-                    `<div class='schema-property-description'>${isRef ? "" : (await marked.parseInline(propertySchemaObj.description ?? "No description"))}</div>`,
+                    `<div class='schema-property-description'>${isRef ? "" : await marked.parseInline(propertySchemaObj.description ?? "No description")}</div>`,
                 );
 
                 const subProperties = propertySchemaObj.properties;

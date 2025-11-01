@@ -50,24 +50,31 @@ export type ConfigFile = {
         };
 
         /**
-         * Main title of the documentation
+         * Metadata information about the api/documentation
          */
-        title?: string;
+        info?: {
+            /**
+             * Main title of the documentation. If omitted, the "title" field from open api specification info object is used.
+             */
+            title?: string;
+
+            /**
+             * Description of the documentation. If omitted, the "description" field from open api specification info object is used.
+             */
+            description?: string;
+
+            /**
+             * Current version of the api/documentation. If omitted, the "version" field from open api specification info object is used.
+             */
+            version?: string;
+        };
 
         /**
-         * Description of the documentation
+         * Server for api endpoints. If omitted, the servers in the open api specification is used.
          */
-        description?: string;
-
-        /**
-         * Current version of the api/documentation
-         */
-        currentVersion?: string;
-
-        /**
-         * Api endpoint host
-         */
-        host?: string;
+        servers?: {
+            url: string;
+        }[]
 
         /**
          * Url of swaggerUi

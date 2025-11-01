@@ -1,0 +1,828 @@
+<html>
+<head>
+<style>
+/**
+* CSS styles for the Postman template.
+* This file is processed with SASS before being applied.
+*/
+:root {
+  --border-light: #dddddd;
+  --bg-light: #dddddd;
+  --bg-ultralight: #f1f1f1;
+  --revisions-table-header-bg: var(--bg-light);
+  --revisions-table-border: var(--border-light);
+  --text-color-description: #444444;
+  --json-border-color: #888888;
+  --json-background-color: #eaeaea;
+  --json-text-color: #444444;
+  --size-h1: 180%;
+  --size-h2: 160%;
+  --size-h3: 140%;
+  --size-h4: 120%;
+}
+
+html,
+body {
+  color: #333;
+  font-family: Arial, sans-serif;
+  /* Force content to stay within page boundaries */
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.page-break {
+  display: block;
+  page-break-before: always;
+}
+
+h1 {
+  font-size: var(--size-h1);
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: var(--size-h2);
+  margin-bottom: 8px;
+}
+
+h3 {
+  font-size: var(--size-h3);
+  margin-bottom: 6px;
+}
+
+h4 {
+  font-size: var(--size-h4);
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/**
+* Front page styles
+*/
+.front-page h1 {
+  margin-top: 250px;
+}
+.front-page .description {
+  margin-top: 12px;
+  color: var(--text-color-description);
+}
+.front-page .current-version {
+  margin-top: 6px;
+  color: #333;
+}
+
+/**
+* Revision page styles
+*/
+.revision-page .revision-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--revisions-table-border);
+}
+.revision-page .revision-table tr th {
+  background-color: var(--revisions-table-header-bg);
+  font-weight: bold;
+}
+.revision-page .revision-table th,
+.revision-page .revision-table td {
+  border: 1px solid var(--border-light);
+  padding: 5px 8px;
+  text-align: left;
+}
+
+/**
+* Summary page styles
+*/
+/**
+* Rest operation styles
+*/
+.operation {
+  margin-bottom: 20px;
+}
+.operation .operation-header {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #dddddd;
+  border-radius: 2px;
+  background-color: #f9f9f9;
+  padding: 4px;
+  align-items: center;
+}
+.operation .operation-method {
+  font-weight: bold;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-right: 10px;
+  text-transform: uppercase;
+  font-size: var(--size-h4);
+}
+.operation .operation-method.GET {
+  background-color: #28a745;
+}
+.operation .operation-method.POST {
+  background-color: #007bff;
+}
+.operation .operation-method.PUT {
+  background-color: #ffc107;
+}
+.operation .operation-method.DELETE {
+  background-color: #dc3545;
+}
+.operation .operation-method.PATCH {
+  background-color: #17a2b8;
+}
+.operation .operation-path {
+  font-size: var(--size-h4);
+}
+.operation .operation-summary {
+  margin-top: 8px;
+  font-size: 90%;
+  color: var(--text-color-description);
+}
+.operation .operation-description {
+  margin-top: 10px;
+}
+.operation .operation-parameters {
+  display: table;
+  width: 100%;
+}
+.operation .operation-parameters .operation-parameter {
+  margin-top: 5px;
+  display: table-row;
+}
+.operation .operation-parameters .operation-parameter .parameter-name {
+  font-weight: bold;
+  width: 20%;
+  display: table-cell;
+}
+.operation .operation-parameters .operation-parameter .parameter-in {
+  display: table-cell;
+  width: 10%;
+}
+.operation .operation-parameters .operation-parameter .parameter-required {
+  color: #d9534f;
+  display: table-cell;
+  width: 10%;
+}
+.operation .operation-parameters .operation-parameter .parameter-type {
+  display: table-cell;
+  width: 10%;
+}
+.operation .operation-parameters .operation-parameter .parameter-description {
+  display: table-cell;
+  width: 50%;
+}
+.operation .operation-parameters .operation-parameter .parameter-description .parameter-description-label-comment {
+  color: #777777;
+}
+.operation .operation-parameters .operation-parameter-header {
+  display: table-row;
+  font-weight: bold;
+}
+.operation .operation-parameters .operation-parameter-header .parameter-name,
+.operation .operation-parameters .operation-parameter-header .parameter-type,
+.operation .operation-parameters .operation-parameter-header .parameter-in,
+.operation .operation-parameters .operation-parameter-header .parameter-required,
+.operation .operation-parameters .operation-parameter-header .parameter-description {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+  display: table-cell;
+}
+.operation .operation-responses {
+  width: 100%;
+}
+.operation .operation-responses .operation-response {
+  width: 100%;
+}
+.operation .operation-responses .operation-response .operation-response-header {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.operation .operation-responses .operation-response .operation-response-header .operation-response-description {
+  color: var(--text-color-description);
+}
+.operation .operation-responses .operation-response .operation-response-content {
+  margin-top: 6px;
+}
+.operation .operation-responses .operation-response .operation-response-content-type {
+  width: 100%;
+}
+.operation .operation-responses .operation-response .operation-response-content-type .operation-response-content-type-content-type {
+  font-weight: bold;
+}
+.operation .operation-responses .operation-response .operation-response-content-type .operation-response-content-type-content {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/**
+* Preformatted code. Mostly applied to JSON samples.
+*/
+pre {
+  background-color: var(--json-background-color);
+  border: 1px solid var(--json-border-color);
+  padding: 3px 5px;
+  font-family: monospace;
+  margin-top: 4px;
+  border-radius: 2px;
+  font-size: 80%;
+  color: var(--json-text-color);
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.schema-oneof {
+  margin-left: 10px;
+  padding-left: 10px;
+  margin-top: 10px;
+  border-left: 2px solid var(--border-light);
+}
+
+/**
+* Json schema styles
+*/
+.schema {
+  margin-bottom: 20px;
+}
+.schema .schema-header .schema-title {
+  font-size: var(--size-h3);
+  font-weight: bold;
+}
+.schema .schema-properties-header {
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: var(--size-h4);
+}
+.schema .schema-sub-properties-header {
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: var(--size-h4);
+}
+.schema .schema-properties {
+  margin-top: 4px;
+  width: 100%;
+}
+.schema .schema-property {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.schema .schema-property .schema-property-name {
+  font-weight: bold;
+  padding: 5px;
+  background-color: var(--bg-ultralight);
+}
+.schema .schema-property .schema-property-required {
+  padding: 5px;
+  color: #d9534f;
+  background-color: var(--bg-ultralight);
+}
+.schema .schema-property .schema-property-type {
+  padding: 5px;
+  flex-grow: 1;
+  background-color: var(--bg-ultralight);
+}
+.schema .schema-property .schema-property-description-container {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+.schema .schema-property .schema-property-description-container .schema-property-description {
+  color: var(--text-color-description);
+}
+.schema .schema-property .schema-property-description-container .schema-property-schema {
+  margin-top: 4px;
+}
+.schema .schema-sample {
+  margin-top: 8px;
+}
+.schema .sub-schema .schema .schema-header .schema-title {
+  font-size: var(--size-h4);
+}
+.schema .properties-padder {
+  margin-left: 10px;
+  padding-left: 10px;
+  margin-top: 10px;
+  border-left: 2px solid var(--border-light);
+}
+
+/**
+* Table of Contents styles
+*/
+.toc .toc-contents .toc-tag .toc-tag-description {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.toc .toc-contents .toc-tag .toc-line a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+.toc .toc-contents .toc-tag .toc-method {
+  width: 80px;
+}
+.toc .toc-contents .toc-tag .toc-summary {
+  margin-left: 80px;
+  color: var(--text-color-description);
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+<!-- 
+From page template.
+
+Available variables:
+- metadata: the full object from the "metadata" field in the config file
+
+-->
+
+<div class='front-page'>
+    
+    <h1>Tic Tac Toe</h1>
+
+    <div class="description">
+        This API allows writing down marks on a Tic Tac Toe board
+and requesting the state of the board or of individual squares.
+
+    </div>
+
+    <div class="current-version">
+        Version 1.0.0
+    </div>
+</div>
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>
+<div class="revision-page">
+    <h3>Revisions</h3>
+    <table class="revision-table">
+        <tr class="revision-table-header">
+            <th>Date</th>
+            <th>Version</th>
+            <th>Author</th>
+            <th>Description</th>
+        </tr>
+        <tr class="revision-table-row">
+            <td>2024-06-01</td>
+            <td>1.0.0</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="revision-table-row">
+            <td>2024-06-15</td>
+            <td>1.1.0</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="revision-table-row">
+            <td>2024-07-01</td>
+            <td>1.2.0</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>
+<!-- 
+Summary page template.
+
+Available variables:
+- metadata: the full object from the "metadata" field in the config file
+
+- openapiJsonPath: the path to the OpenAPI JSON file
+
+-->
+
+<div class='summary-page'>
+    <h2>Summary</h2>
+    <div class="server-info">
+        
+
+
+        
+        <b><a href='https://swagger.io/specification/'>OpenAPI</a> JSON</b>: https://raw.githubusercontent.com/OAI/learn.openapis.org/refs/heads/main/examples/v3.1/tictactoe.json<br><br>
+        
+    </div>
+</div>
+
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>
+
+
+<!-- 
+Template for the Table of Contents section.
+    
+Available vars:
+- content: pre-rendered HTML content for the TOC
+-->
+
+<div class="toc">
+    <h2>Table of Contents</h2>
+    <div class="toc-contents">
+        <!-- 
+
+Toc "tag" or "group" template. this mostly separates lines in groups where the title is the
+openapi api tag and tag summary
+
+Avalable vars:
+- title: the tag title
+- description: the tag description (in HTML)
+- lines: array of pre-rendered toc lines (HTML)
+
+-->
+
+<div class="toc-tag">
+    <h4>Gameplay</h4>
+    <div class="toc-tag-description">
+        
+    </div>
+
+    <div class="toc-lines">
+        <!-- this is a pre-rendered array of toc lines  -->
+            <!-- avalable vars:
+
+- method: HTTP method (GET, POST, etc.)
+- path: API endpoint path
+- summary: Brief description of the operation
+- link: Anchor link to the operation details section
+-->
+
+<div class="toc-line">
+    <a href="#get--board">
+        <div class="toc-method">GET</div>
+        <div class="toc-path">/board</div>
+    </a>
+    <div class="toc-summary">Get the whole board</div>
+</div>
+            <!-- avalable vars:
+
+- method: HTTP method (GET, POST, etc.)
+- path: API endpoint path
+- summary: Brief description of the operation
+- link: Anchor link to the operation details section
+-->
+
+<div class="toc-line">
+    <a href="#get--board-{row}-{column}">
+        <div class="toc-method">GET</div>
+        <div class="toc-path">/board/{row}/{column}</div>
+    </a>
+    <div class="toc-summary">Get a single board square</div>
+</div>
+            <!-- avalable vars:
+
+- method: HTTP method (GET, POST, etc.)
+- path: API endpoint path
+- summary: Brief description of the operation
+- link: Anchor link to the operation details section
+-->
+
+<div class="toc-line">
+    <a href="#put--board-{row}-{column}">
+        <div class="toc-method">PUT</div>
+        <div class="toc-path">/board/{row}/{column}</div>
+    </a>
+    <div class="toc-summary">Set a single board square</div>
+</div>
+    </div>
+</div>
+    </div>
+</div>
+
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>
+<!--
+Template for the API section of the documentation.
+Available variables:
+- content: pre-rendered HTML content for the API section, including all operations.
+-->
+
+<div class="api-page">
+    <h3>REST Api</h3>
+    <div class="api-content">
+    <!--
+
+Single rest operation template.
+
+Available variables:
+- anchor: the HTML anchor for this operation
+- method: HTTP method (GET, POST, etc.)
+- path: the API path (e.g., /users/{id})
+- operation
+   - summary: brief description of the operation
+   - description: detailed description of the operation (in HTML)
+   - parameters: pre-rendered array of HTML for the parameters block. If no parameters, this may be undefined
+   - responses: pre-rendered array of HTML for the responses block. If no responses, this may be undefined
+-->
+
+<div class="operation" id="get--board">
+    <div class="operation-header">
+        <div class="operation-method GET">GET</div>
+        <div class="operation-path">/board</div>
+    </div>
+        <div class="operation-summary">
+            Get the whole board
+        </div>
+
+        <div class="operation-description">
+            <div>Retrieves the current state of the board and the winner.</div>
+        </div>
+
+
+        <h4>Responses</h4>
+        <div class="operation-responses">
+            <!-- this is a pre-rendered array of operation responses  -->
+                <!-- 
+Template for single operation response.
+-->
+<div class="operation-response">
+    <div class="operation-response-header">
+        <div class="operation-response-code">200</div>
+        <div class="operation-response-description">
+            <!-- this is a preprocesed description in HTML -->
+            OK
+        </div>
+    </div>
+    <div class="operation-response-content">
+        <!-- this is a preprocesed description in HTML -->
+        
+<div class="operation-response-content-type">
+    <div class="operation-response-content-type-content-type">Content-type: application/json</div>
+    <div class="operation-response-content-type-content">
+        <!-- this is a preprocesed description in HTML -->
+        See referenced schema <a href="#/components/schemas/status">status</a>
+    </div>
+</div>
+
+    </div>
+</div>
+
+        </div>
+</div>
+
+
+<!--
+
+Single rest operation template.
+
+Available variables:
+- anchor: the HTML anchor for this operation
+- method: HTTP method (GET, POST, etc.)
+- path: the API path (e.g., /users/{id})
+- operation
+   - summary: brief description of the operation
+   - description: detailed description of the operation (in HTML)
+   - parameters: pre-rendered array of HTML for the parameters block. If no parameters, this may be undefined
+   - responses: pre-rendered array of HTML for the responses block. If no responses, this may be undefined
+-->
+
+<div class="operation" id="get--board-{row}-{column}">
+    <div class="operation-header">
+        <div class="operation-method GET">GET</div>
+        <div class="operation-path">/board/{row}/{column}</div>
+    </div>
+        <div class="operation-summary">
+            Get a single board square
+        </div>
+
+        <div class="operation-description">
+            <div>Retrieves the requested square.</div>
+        </div>
+
+
+        <h4>Responses</h4>
+        <div class="operation-responses">
+            <!-- this is a pre-rendered array of operation responses  -->
+                <!-- 
+Template for single operation response.
+-->
+<div class="operation-response">
+    <div class="operation-response-header">
+        <div class="operation-response-code">200</div>
+        <div class="operation-response-description">
+            <!-- this is a preprocesed description in HTML -->
+            OK
+        </div>
+    </div>
+    <div class="operation-response-content">
+        <!-- this is a preprocesed description in HTML -->
+        
+<div class="operation-response-content-type">
+    <div class="operation-response-content-type-content-type">Content-type: application/json</div>
+    <div class="operation-response-content-type-content">
+        <!-- this is a preprocesed description in HTML -->
+        See referenced schema <a href="#/components/schemas/mark">mark</a>
+    </div>
+</div>
+
+    </div>
+</div>
+
+                <!-- 
+Template for single operation response.
+-->
+<div class="operation-response">
+    <div class="operation-response-header">
+        <div class="operation-response-code">400</div>
+        <div class="operation-response-description">
+            <!-- this is a preprocesed description in HTML -->
+            The provided parameters are incorrect
+        </div>
+    </div>
+    <div class="operation-response-content">
+        <!-- this is a preprocesed description in HTML -->
+        
+<div class="operation-response-content-type">
+    <div class="operation-response-content-type-content-type">Content-type: text/html</div>
+    <div class="operation-response-content-type-content">
+        <!-- this is a preprocesed description in HTML -->
+        See referenced schema <a href="#/components/schemas/errorMessage">errorMessage</a>
+    </div>
+</div>
+
+    </div>
+</div>
+
+        </div>
+</div>
+
+
+<!--
+
+Single rest operation template.
+
+Available variables:
+- anchor: the HTML anchor for this operation
+- method: HTTP method (GET, POST, etc.)
+- path: the API path (e.g., /users/{id})
+- operation
+   - summary: brief description of the operation
+   - description: detailed description of the operation (in HTML)
+   - parameters: pre-rendered array of HTML for the parameters block. If no parameters, this may be undefined
+   - responses: pre-rendered array of HTML for the responses block. If no responses, this may be undefined
+-->
+
+<div class="operation" id="put--board-{row}-{column}">
+    <div class="operation-header">
+        <div class="operation-method PUT">PUT</div>
+        <div class="operation-path">/board/{row}/{column}</div>
+    </div>
+        <div class="operation-summary">
+            Set a single board square
+        </div>
+
+        <div class="operation-description">
+            <div>Places a mark on the board and retrieves the whole board and the winner (if any).</div>
+        </div>
+
+
+        <h4>Responses</h4>
+        <div class="operation-responses">
+            <!-- this is a pre-rendered array of operation responses  -->
+                <!-- 
+Template for single operation response.
+-->
+<div class="operation-response">
+    <div class="operation-response-header">
+        <div class="operation-response-code">200</div>
+        <div class="operation-response-description">
+            <!-- this is a preprocesed description in HTML -->
+            OK
+        </div>
+    </div>
+    <div class="operation-response-content">
+        <!-- this is a preprocesed description in HTML -->
+        
+<div class="operation-response-content-type">
+    <div class="operation-response-content-type-content-type">Content-type: application/json</div>
+    <div class="operation-response-content-type-content">
+        <!-- this is a preprocesed description in HTML -->
+        See referenced schema <a href="#/components/schemas/status">status</a>
+    </div>
+</div>
+
+    </div>
+</div>
+
+                <!-- 
+Template for single operation response.
+-->
+<div class="operation-response">
+    <div class="operation-response-header">
+        <div class="operation-response-code">400</div>
+        <div class="operation-response-description">
+            <!-- this is a preprocesed description in HTML -->
+            The provided parameters are incorrect
+        </div>
+    </div>
+    <div class="operation-response-content">
+        <!-- this is a preprocesed description in HTML -->
+        
+<div class="operation-response-content-type">
+    <div class="operation-response-content-type-content-type">Content-type: text/html</div>
+    <div class="operation-response-content-type-content">
+        <!-- this is a preprocesed description in HTML -->
+        See referenced schema <a href="#/components/schemas/errorMessage">errorMessage</a>
+    </div>
+</div>
+
+    </div>
+</div>
+
+        </div>
+</div>
+
+
+    </div>
+</div>
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>
+<div class="schemas-page">
+    <h2>Schemas</h2>
+    <div class="schemas-content">
+        <div class='schema'>
+   <div class='schema-header'>
+      <div class='schema-title' id=/components/schemas/errorMessage>errorMessage</div>
+      <div class='schema-type'>Type: string</div>
+      <div class='schema-sample'>Example:<br><pre>"string"</pre></div>
+   </div>
+</div>
+<div class='schema'>
+   <div class='schema-header'>
+      <div class='schema-title' id=/components/schemas/coordinate>coordinate</div>
+      <div class='schema-type'>Type: integer</div>
+      <div class='schema-sample'>Example:<br><pre>1</pre></div>
+   </div>
+</div>
+<div class='schema'>
+   <div class='schema-header'>
+      <div class='schema-title' id=/components/schemas/mark>mark</div>
+      <div class='schema-type'>Type: string</div>
+      <div class='schema-sample'>Example:<br><pre>"."</pre></div>
+   </div>
+</div>
+<div class='schema'>
+   <div class='schema-header'>
+      <div class='schema-title' id=/components/schemas/board>board</div>
+      <div class='schema-type'>Type: array</div>
+   </div>
+</div>
+<div class='schema'>
+   <div class='schema-header'>
+      <div class='schema-title' id=/components/schemas/winner>winner</div>
+      <div class='schema-type'>Type: string</div>
+      <div class='schema-sample'>Example:<br><pre>"."</pre></div>
+   </div>
+</div>
+<div class='schema'>
+   <div class='schema-header'>
+      <div class='schema-title' id=/components/schemas/status>status</div>
+      <div class='schema-type'>Type: object</div>
+   </div>
+<div class=''>
+<div class='schema-properties-header'>Properties</div>
+<div class='schema-properties'>
+<div class='schema-property'>
+<div class='schema-property-name'>winner</div>
+<div class='schema-property-required'></div>
+<div class='schema-property-type'> </div>
+<div class='schema-property-description-container'>
+<div class='schema-property-description'>Winner of the game. <code>.</code> means nobody has won yet.<br><br>See referenced schema <a href="#/components/schemas/winner">winner</a></div>
+</div>
+</div>
+<div class='schema-property'>
+<div class='schema-property-name'>board</div>
+<div class='schema-property-required'></div>
+<div class='schema-property-type'> </div>
+<div class='schema-property-description-container'>
+<div class='schema-property-description'><br><br>See referenced schema <a href="#/components/schemas/board">board</a></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+</div>
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>
+
+</body>
+</html>

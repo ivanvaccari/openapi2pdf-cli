@@ -3,18 +3,19 @@ From page template.
 
 Available variables:
 - metadata: the full object from the "metadata" field in the config file
+
 -->
 
 <div class='front-page'>
     
-    <h1>{{ metadata.title}}</h1>
+    <h1>{{ metadata.info.title}}</h1>
 
     <div class="description">
-        {{ metadata.description}}
+        {{ metadata.info.description}}
     </div>
 
     <div class="current-version">
-        Version {{ metadata.currentVersion}}
+        Version {{ metadata.info.version}}
     </div>
 </div>
 
