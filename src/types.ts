@@ -1,5 +1,8 @@
 import { PaperFormat } from "puppeteer";
 
+/**
+ * Configuration file type
+ */
 export type ConfigFile = {
     /**
      * Template files directory. If provided, must be a reltive path directory.
@@ -35,7 +38,14 @@ export type ConfigFile = {
          * Metadata to be set on the pdf file
          */
         pdf?: {
+            /**
+             * Title of the document
+             */
             title?: string;
+
+            /**
+             * Author of the document
+             */
             author?: string;
         };
 
@@ -102,6 +112,10 @@ export type ConfigFile = {
          */
         scale?: number;
 
+        /**
+         * Page ranges to print, e.g., '1-5, 8, 11-13'. Defaults to all pages.
+         * See https://pptr.dev/api/puppeteer.pdfoptions
+         */
         pageRanges?: string;
 
         /**
@@ -110,7 +124,16 @@ export type ConfigFile = {
          */
         format?: PaperFormat;
 
+        /**
+         * Sets the width of paper. You can pass in a number or a string with a unit.
+         * See https://pptr.dev/api/puppeteer.pdfoptions
+         */
         width?: string | number;
+
+        /**
+         * Sets the height of paper. You can pass in a number or a string with a unit.
+         * See https://pptr.dev/api/puppeteer.pdfoptions
+         */
         height?: string | number;
 
         /**
@@ -122,7 +145,12 @@ export type ConfigFile = {
             bottom?: string | number; // defaults to 15mm
             left?: string | number; // defaults to 15mm
         };
-        mediaType?: string;
+
+        /**
+         * Other pdf options supported by puppeteer
+         */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
     };
 
     /**
