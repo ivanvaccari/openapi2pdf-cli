@@ -1,0 +1,22 @@
+<!--
+Footer template. See https://pptr.dev/api/puppeteer.pdfoptions -> footerTemplate for info.
+
+Use one of the following puppeteer variables to include dynamic content:
+
+<span class="pageNumber"></span>  -> current page number
+<span class="totalPages"></span>  -> total number of pages
+<span class="date"></span>  -> current date
+<span class="title"></span>  -> document title
+<span class="url"></span>  -> document URL
+
+Also, you can use the following handlebars variables:
+- metadata: the OpenAPI metadata object
+
+NOTE1: Set the style directly in this file, do not use external styles.css.
+NOTE2: Be sure to set text size in pixels, or text may not appear in the PDF.
+-->
+
+<div style="font-size: 12px; display: flex; justify-content: space-between; width: 100%; padding: 0 20px; color: #aaaaaa;">
+    <span>{{metadata.title}}</span>
+    <span class="pageNumber"></span>
+</div>

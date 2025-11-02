@@ -11,9 +11,11 @@ Available variables:
    - description: detailed description of the operation (in HTML)
    - parameters: pre-rendered array of HTML for the parameters block. If no parameters, this may be undefined
    - responses: pre-rendered array of HTML for the responses block. If no responses, this may be undefined
+   - requestBody: pre-rendered HTML for the request body block. If no request body, this may be undefined
 -->
 
 <div class="operation" id="{{anchor}}">
+    <h2>{{operation.summary}}</h2>
     <div class="operation-header">
         <div class="operation-method {{method}}">{{method}}</div>
         <div class="operation-path">{{path}}</div>
@@ -44,6 +46,13 @@ Available variables:
             {{#each operation.parameters}}
                 {{{this}}}
             {{/each}}
+        </div>
+    {{/if}}
+
+    {{#if operation.requestBody}}
+        <h4>Request Body</h4>
+        <div class="operation-request-body">
+            {{{operation.requestBody}}}
         </div>
     {{/if}}
 

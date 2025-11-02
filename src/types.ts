@@ -266,7 +266,12 @@ export type TemplateFiles = {
     /**
      * Template for the schemas section
      */
-    schemas: string
+    schemas: string;
+
+    /**
+     * Body template for methods that support it (like POST, PUT, PATCH)
+     */
+    operationBody: string;
 };
 
 /**

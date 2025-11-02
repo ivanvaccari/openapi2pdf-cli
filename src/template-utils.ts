@@ -26,6 +26,7 @@ export const templateFilenames: TemplateFiles = {
     api: "api.hbs",
     schemas: "schemas.hbs",
     tocTag: "toc-tag.hbs",
+    operationBody: "operation-body.hbs",
 };
 
 /**

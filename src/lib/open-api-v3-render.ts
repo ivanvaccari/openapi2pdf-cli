@@ -21,6 +21,7 @@ export class OpenApiV3Render {
     private apiTemplate: Handlebars.TemplateDelegate;
     private schemasTemplate: Handlebars.TemplateDelegate;
     private tocTagTemplate: Handlebars.TemplateDelegate;
+    private operationBodyTemplate: Handlebars.TemplateDelegate;
     private configFile: ConfigFile;
     private templates: TemplateFiles;
     private openApiSpecJson: OpenAPIV3.Document;
@@ -39,6 +40,7 @@ export class OpenApiV3Render {
         this.tocTemplate = Handlebars.compile(this.templates.toc);
         this.apiTemplate = Handlebars.compile(this.templates.api);
         this.schemasTemplate = Handlebars.compile(this.templates.schemas);
+        this.operationBodyTemplate = Handlebars.compile(this.templates.operationBody);
     }
 
     /**
@@ -227,6 +229,47 @@ export class OpenApiV3Render {
     }
 
     /**
+     * 
+     * @param requestBody 
+     * @returns 
+     */
+    private async renderRequestBody(
+        requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,
+    ): Promise<string | undefined> {
+        if ((requestBody as OpenAPIV3.ReferenceObject).$ref) {
+            return undefined; // TODO: resolve $ref
+        }
+
+        const bodyContent: {
+            required: boolean;
+            description: string;
+            contentTypes: { contentType: string; schema: string }[];
+        } = {
+            required: (requestBody as OpenAPIV3.RequestBodyObject).required || false,
+            description: (requestBody as OpenAPIV3.RequestBodyObject).description
+                ? await marked.parseInline((requestBody as OpenAPIV3.RequestBodyObject).description || "")
+                : "",
+            contentTypes: [],
+        };
+
+        const requestBodyAsObject = requestBody as OpenAPIV3.RequestBodyObject;
+        const contentTypes = Object.keys(requestBodyAsObject.content || {});
+        for (const contentType of contentTypes) {
+            const schema = requestBodyAsObject.content[contentType]?.schema;
+            if (!schema) continue;
+            const schemaHtml = await new JsonSchemaRender("", "", schema, this.openApiSpecJson).render();
+
+            bodyContent.contentTypes.push({
+                contentType: contentType,
+                schema: schemaHtml,
+            });
+        }
+
+        const renderedHtml = this.operationBodyTemplate(bodyContent);
+        return renderedHtml;
+    }
+
+    /**
      *
      * @returns
      */
@@ -234,24 +277,34 @@ export class OpenApiV3Render {
         // Start rendering operations
         for (const path in this.openApiSpecJson.paths) {
             const pathItem = this.openApiSpecJson.paths[path];
+
             // this is only for type checking
             if (!pathItem) continue;
 
-            for (const method of ["get", "post", "put", "delete", "patch", "options", "head", "trace"]) {
+            // Check each method
+            const methods = Object.values(OpenAPIV3.HttpMethods);
+
+            for (const method of methods) {
                 // ignore if the method does not exist on the path item
                 if (!(method in pathItem)) continue;
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const operation = (pathItem as any)[method];
+                const operation = pathItem[method];
+                if (!operation) continue;
 
                 // render parameters html
                 const parametersHtml = await this.processParameters(operation);
                 // render responses html
                 const responsesHtml = await this.processResponses(operation);
 
+                let requestBody: string | undefined = undefined;
+                if (operation.requestBody) {
+                    requestBody = await this.renderRequestBody(operation.requestBody);
+                }
+
                 const operationHtml = this.operationTemplate({
                     operation: {
                         ...operation,
+                        requestBody: requestBody,
                         parameters: parametersHtml,
                         responses: responsesHtml,
                     },

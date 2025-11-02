@@ -1,0 +1,26 @@
+<!--
+
+required: boolean;
+description: string;
+contentTypes: { contentType: string; schema: string }[];
+
+-->
+
+<div class="operation-body">
+    {{#if description}}
+        <div class="operation-body-description">{{{description}}}</div>
+    {{/if}}
+
+    {{#if required}}
+        <div class="operation-body-required">Required</div>
+    {{/if}}
+
+    {{#if contentTypes}}
+        <div class="operation-body-content-types">
+        {{#each contentTypes}}
+            <div><strong>Content-type: {{contentType}}</strong></div>
+            <div class="operation-body-schema">{{{schema}}}</div>
+        {{/each}}
+        </div>
+    {{/if}}
+</div>
