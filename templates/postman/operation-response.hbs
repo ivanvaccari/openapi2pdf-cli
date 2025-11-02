@@ -1,16 +1,19 @@
 <!-- 
 Template for single operation response.
+
+Available variables:
+- code: string;
+- description: string; // pre-rendered HTML
+- content: string; // pre-rendered HTML
 -->
 <div class="operation-response">
     <div class="operation-response-header">
-        <div class="operation-response-code">{{response.code}}</div>
+        <div class="operation-response-code">{{code}}</div>
         <div class="operation-response-description">
-            <!-- this is a preprocesed description in HTML -->
-            {{{response.description}}}
+            {{{description}}}
         </div>
     </div>
     <div class="operation-response-content">
-        <!-- this is a preprocesed description in HTML -->
-        {{{response.content}}}
+        {{{content}}}
     </div>
 </div>

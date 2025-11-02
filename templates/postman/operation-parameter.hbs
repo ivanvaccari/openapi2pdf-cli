@@ -1,22 +1,36 @@
+<!-- 
+Template for a single operation parameter in the API section.
+Available variables:
+
+- name: string;
+- in: string;
+- required: boolean;
+- description: string; // pre-rendered HTML
+- schema: string; // pre-rendered schema
+- type: string;
+- isArray: boolean;
+  
+-->
+
 <div class="operation-parameter">
-    <div class="parameter-name">{{parameter.name}}</div>
-    <div class="parameter-type">{{parameter.type}}</div>
-    <div class="parameter-in">{{parameter.in}}</div>
+    <div class="parameter-name">{{name}}</div>
+    <div class="parameter-type">{{type}}</div>
+    <div class="parameter-in">{{in}}</div>
     <div class="parameter-required">
-        {{#if parameter.required}}
+        {{#if required}}
             required
         {{/if}}
     </div>
     <div class="parameter-description">
-    {{#if parameter.description}}
+    {{#if description}}
         <!-- this is a preprocesed description in HTML -->
-        <div class="parameter-description-label">{{{parameter.description}}}</div>
+        <div class="parameter-description-label">{{{description}}}</div>
     {{/if}}
-    {{#if parameter.schema}}
-        {{#if parameter.isArray}}
+    {{#if schema}}
+        {{#if isArray}}
             <div class="parameter-description-label-comment">Each item of the array:</div>
         {{/if}}
-        <pre>{{parameter.schema}}</pre>
+        <pre>{{schema}}</pre>
     {{/if}}
     </div>
 </div>

@@ -13,7 +13,7 @@ import Handlebars from "handlebars";
 export class OpenApiV3Render {
     private html: string[] = [];
     private operationTemplate: Handlebars.TemplateDelegate;
-    private operationParametersTemplate: Handlebars.TemplateDelegate;
+    private operationParameterTemplate: Handlebars.TemplateDelegate;
     private operationResponseTemplate: Handlebars.TemplateDelegate;
     private operationResponseContentTypeTemplate: Handlebars.TemplateDelegate;
     private tocLineTemplate: Handlebars.TemplateDelegate;
@@ -32,7 +32,7 @@ export class OpenApiV3Render {
         this.openApiSpecJson = Object.freeze(openApiSpecJson);
         // prepare some templates to be used during rendering
         this.operationTemplate = Handlebars.compile(this.templates.operation);
-        this.operationParametersTemplate = Handlebars.compile(this.templates.operationParameter);
+        this.operationParameterTemplate = Handlebars.compile(this.templates.operationParameter);
         this.operationResponseTemplate = Handlebars.compile(this.templates.operationResponse);
         this.operationResponseContentTypeTemplate = Handlebars.compile(this.templates.operationResponseContentType);
         this.tocTagTemplate = Handlebars.compile(this.templates.tocTag);
@@ -117,16 +117,14 @@ export class OpenApiV3Render {
         if (!schema) return { parameter: parameter };
         const { type, ...schemaObjectWithoutType } = schema as OpenAPIV3.SchemaObject;
         return {
-            parameter: {
-                ...parameter,
-                description: parameter.description ? await marked.parseInline(parameter.description || "") : undefined,
-                type: type,
-                isArray: type === "array",
-                schema:
-                    Object.keys(schemaObjectWithoutType).length > 0
-                        ? JSON.stringify(schemaObjectWithoutType, null, 2)
-                        : undefined,
-            },
+            ...parameter,
+            description: parameter.description ? await marked.parseInline(parameter.description || "") : undefined,
+            type: type,
+            isArray: type === "array",
+            schema:
+                Object.keys(schemaObjectWithoutType).length > 0
+                    ? JSON.stringify(schemaObjectWithoutType, null, 2)
+                    : undefined,
         };
     }
 
@@ -152,7 +150,6 @@ export class OpenApiV3Render {
      * Generate the parameters HTML for an operation
      *
      * @param operation the operation object
-     * @param operationParametersTemplate the template to be used for each parameter
      */
     private async processParameters(operation: OpenAPIV3.OperationObject): Promise<string[] | undefined> {
         // process the parameters. this will produce an
@@ -166,7 +163,7 @@ export class OpenApiV3Render {
                     parameter = _.get(this.openApiSpecJson, refPath);
                 }
 
-                const parameterHtml = this.operationParametersTemplate(
+                const parameterHtml = this.operationParameterTemplate(
                     await this.preprocessParameter(parameter as OpenAPIV3.ParameterObject),
                 );
                 parametersHtml.push(parameterHtml);
@@ -202,23 +199,19 @@ export class OpenApiV3Render {
                             );
                         }
                         const contentHtml = this.operationResponseContentTypeTemplate({
-                            contentType: {
-                                contentType: contentType,
-                                content: contentSchema,
-                            },
+                            contentType: contentType,
+                            content: contentSchema,
                         });
                         contentTypesHtml.push(contentHtml);
                     }
                 }
 
                 const responseHtml = this.operationResponseTemplate({
-                    response: {
-                        code: statusCode,
-                        description: responseForStatuscode.description
-                            ? await marked.parseInline(responseForStatuscode.description)
-                            : undefined,
-                        content: contentTypesHtml.length > 0 ? contentTypesHtml.join("\n") : undefined,
-                    },
+                    code: statusCode,
+                    description: responseForStatuscode.description
+                        ? await marked.parseInline(responseForStatuscode.description)
+                        : undefined,
+                    content: contentTypesHtml.length > 0 ? contentTypesHtml.join("\n") : undefined,
                 });
 
                 responsesHtml.push(responseHtml);
@@ -229,9 +222,9 @@ export class OpenApiV3Render {
     }
 
     /**
-     * 
-     * @param requestBody 
-     * @returns 
+     *
+     * @param requestBody
+     * @returns
      */
     private async renderRequestBody(
         requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,

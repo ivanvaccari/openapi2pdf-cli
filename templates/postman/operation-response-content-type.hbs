@@ -1,8 +1,13 @@
+<!-- 
+Template for render a single "content type" in an operation response.
+Available variables:
+- contentType: string;
+- content: pre-rendered HTML description of the content type;
+-->
 
 <div class="operation-response-content-type">
-    <div class="operation-response-content-type-content-type">Content-type: {{contentType.contentType}}</div>
+    <div class="operation-response-content-type-content-type">Content-type: {{contentType}}</div>
     <div class="operation-response-content-type-content">
-        <!-- this is a preprocesed description in HTML -->
-        {{{contentType.content}}}
+        {{{content}}}
     </div>
 </div>

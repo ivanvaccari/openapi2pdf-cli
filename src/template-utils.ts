@@ -190,7 +190,7 @@ export async function renderHtml(
 
     const body = template({
         metadata: configFile.metadata,
-        openapiJsonPath: configFile.openapiJsonPath,
+        openApiSpecJson: openApiSpecJson,
     });
 
     const header = Handlebars.compile(templates.header)({
