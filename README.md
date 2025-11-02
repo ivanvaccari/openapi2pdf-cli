@@ -58,11 +58,15 @@ See an example configuration file here: [samples\openapi2pdf-test.config.js](./s
 
 This tool uses handlebars templates to generate the documentation. The template is composed of multiple files, each one responsible for rendering a specific section of the documentation.
 
-This tool provides a built-in template named `postman`, which is inspired by the Postman documentation style. To use the built-in template, you don't need to specify any template in the configuration file, otherwise you can use the configuration file option `template` to specify your own template directory.
+This tool provides the following built-in templates:
+- `postman`,  inspired by the Postman documentation style
+- `hurraycola`, inspired by some random documents found online
 
-The template directory must contain the following files:
+Omitting the `template` option in the configuration file will use the `postman` built-in template.
 
-- `api.hbs`: temlpate for the "Rest Api" page, which includes all the operations
+You can use your own template by specifying the `template` option in the configuration file with the path (relative to the config file) to your template directory. The template directory must contain the following files:
+
+- `api.hbs`: template for the "Rest Api" page, which includes all the operations
 - `assumptions.hbs`: template for the "Assumptions" page, that you can use to describe any assumption made in the API design or to add custom notes after the `frontpage.hbs` content.
 - `frontpage.hbs`: template for the front page of the documentation, that usually contains the title, description and other general information about the API.
 - `header.hbs`: template for the header of each page
@@ -81,7 +85,7 @@ The template directory must contain the following files:
 - `summary.hbs`: template for the summary page of the documentation
 - `revisions.hbs`: template for the revisions page of the documentation
 
-You can use the `postman` template as a starting point to create your own custom templates.
+You can use one of the built-in templates as a starting point to create your own custom templates.
 
 All template files are mandatory. If you don't want to render a specific section, create an empty file.
 
