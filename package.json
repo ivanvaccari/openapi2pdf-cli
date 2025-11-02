@@ -7,6 +7,9 @@
         "test": "tsc && node dist/index.js --config openapi2pdf-test.config.js",
         "build": "tsc"
     },
+    "bin": {
+        "openapi2pdf": "./dist/index.js"
+    },
     "author": "",
     "license": "ISC",
     "dependencies": {

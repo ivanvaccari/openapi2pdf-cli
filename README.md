@@ -24,6 +24,7 @@ git clone https://github.com/ivanvaccari/openapi2pdf-cli
 cd openapi2pdf-cli
 npm install
 npm run build
+npm link
 ```
 
 ### Run the generator
@@ -31,7 +32,7 @@ npm run build
 To run the tool, use the following command:
 
 ```bash
-node dist/index.js --config openapi2pdf.config.js
+openapi2pdf --config openapi2pdf.config.js
 ```
 
 You will find the generated documentation in the specified output files.

@@ -91,6 +91,8 @@ export async function loadTemplateFiles(templatePath: string): Promise<TemplateF
     templatePath = templatePath.replace(/\//g, "\\");
 
     // resolves "url(...)" in css to base64 data urls
+    // url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...)
+    // so there's no problems with paths later
     const regex = /url\(['"]([^'")]+)['"]\)/gm;
     const matcher = templates.style.matchAll(regex);
     for (const match of matcher) {
@@ -105,6 +107,8 @@ export async function loadTemplateFiles(templatePath: string): Promise<TemplateF
     }
 
     // resolves "<img src="...">" in tempates to base64 imgs
+    // <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...)
+    // so there's no problems with paths later
     const imgRegex = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*>/gm;
     for (const key of Object.keys(templates) as (keyof TemplateFiles)[]) {
         const templateContent = templates[key];

@@ -1,10 +1,11 @@
+#!/usr/bin/env node
+
 import { program } from "commander";
 import { loadConfigFile, mergeConfigFileMetadata } from "./config-file";
 import fs from "fs";
 import { findTemplatePath, loadTemplateFiles, renderHtml } from "./template-utils";
 import { renderPdf } from "./render-pdf";
 import { loadOpenApiJson } from "./lib/load-open-api-json";
-import { mergeConfig } from "axios";
 
 /**
  * Main entry point of the tool
@@ -70,6 +71,6 @@ async function run() {
 }
 
 run().catch((err) => {
-    console.error(err);
+    console.error(err.message);
     process.exit(1);
 });
