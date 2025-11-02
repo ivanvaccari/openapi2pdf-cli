@@ -18,7 +18,11 @@ export class JsonSchemaRender {
     constructor(
         protected name: string,
         protected link: string,
-        protected schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject,
+        protected schema:
+            | OpenAPIV3.SchemaObject
+            | OpenAPIV3.ReferenceObject
+            | OpenAPIV3_1.SchemaObject
+            | OpenAPIV3_1.ReferenceObject,
         protected openApiSpecJson: OpenAPIV3.Document<object> | OpenAPIV3_1.Document<object>,
     ) {
         // this.fullSchemaWithResolvedRefs = this.resolveRefs(openApiSpecJson);
@@ -62,7 +66,11 @@ export class JsonSchemaRender {
     private async iterate(
         name: string,
         link: string,
-        schemaOrReference: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject,
+        schemaOrReference:
+            | OpenAPIV3.SchemaObject
+            | OpenAPIV3.ReferenceObject
+            | OpenAPIV3_1.SchemaObject
+            | OpenAPIV3_1.ReferenceObject,
     ) {
         if ((schemaOrReference as OpenAPIV3.ReferenceObject).$ref) {
             const ref = (schemaOrReference as OpenAPIV3.ReferenceObject).$ref;
@@ -93,7 +101,7 @@ export class JsonSchemaRender {
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             sample = JSON.stringify(OpenApiSampler(schema as any, {}, this.schema), null, 2);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Error generating sample for schema", name, error?.message);
             sample = "";
@@ -104,10 +112,11 @@ export class JsonSchemaRender {
         this.html.push(`      <div class='schema-title' id=${link.replace("#", "")}>${name}</div>`);
         this.html.push(`      <div class='schema-type'>Type: ${schema.type}</div>`);
 
-        if (sample) {
-            this.html.push(`      <div class='schema-sample'>Example:<br><pre>${sample}</pre></div>`);
-        }
         this.html.push("   </div>");
+
+        if (sample) {
+            this.html.push(`<div class='schema-sample'>Example:<br><pre>${sample}</pre></div>`);
+        }
 
         // Render properties
         if (Object.keys(schema.properties ?? {}).length > 0) {
@@ -128,11 +137,17 @@ export class JsonSchemaRender {
         if (Object.keys(schema?.properties || {}).length === 0) return;
 
         const header = level === 0 ? "Properties" : "Sub-properties";
-        const headerClass = level === 0 ? "schema-properties-header" : "schema-sub-properties-header";
+        const headerClass = level === 0 ? "schema-properties-title" : "schema-sub-properties-title";
         const padderClass = level === 0 ? "" : "properties-padder";
         this.html.push(`<div class='${padderClass}'>`);
         this.html.push(`<div class='${headerClass}'>${header}</div>`);
         this.html.push("<div class='schema-properties'>");
+        this.html.push("<div class='schema-properties-header'>");
+        this.html.push("  <div class='schema-property-name'>Name</div>");
+        this.html.push("  <div class='schema-property-required'>Required</div>");
+        this.html.push("  <div class='schema-property-type'>Type</div>");
+        this.html.push("  <div class='schema-property-description'>Description</div>");
+        this.html.push("</div>"); // end of schema-properties-header
         for (const propertyName in schema.properties) {
             const propertySchema = schema.properties[propertyName];
             if (!propertySchema) continue;
@@ -145,7 +160,7 @@ export class JsonSchemaRender {
             this.html.push("<div class='schema-property'>");
             this.html.push(`<div class='schema-property-name'>${propertyName}</div>`);
             this.html.push(
-                `<div class='schema-property-required'>${schema.required && schema.required.includes(propertyName) ? "(required)" : ""}</div>`,
+                `<div class='schema-property-required'>${schema.required && schema.required.includes(propertyName) ? "Required" : ""}</div>`,
             );
 
             this.html.push(`<div class='schema-property-type'>${isRef ? "" : propertySchemaObj.type} ${format}</div>`);

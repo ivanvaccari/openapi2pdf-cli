@@ -199,6 +199,7 @@ export class OpenApiV3Render {
                             );
                         }
                         const contentHtml = this.operationResponseContentTypeTemplate({
+                            status: statusCode,
                             contentType: contentType,
                             content: contentSchema,
                         });
