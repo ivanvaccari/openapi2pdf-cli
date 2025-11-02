@@ -92,8 +92,3 @@ All template files are mandatory. If you don't want to render a specific section
 ## Examples
 
 See the [samples](./samples) directory for example configuration file and generated documentation.
-
-- [./samples/openapi2pdf.config.js](./samples/openapi2pdf.config.js)
-- [./samples/shopify-2020.pdf](./samples/shopify-2020.pdf)
-- [./samples/pet-store.pdf](./samples/pet-store.pdf)
-- [./samples/tic-tac-toe.pdf](./samples/tic-tac-toe.pdf)
