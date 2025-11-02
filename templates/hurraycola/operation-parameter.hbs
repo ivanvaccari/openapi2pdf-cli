@@ -1,0 +1,33 @@
+<!-- 
+Template for a single operation parameter in the API section.
+Available variables:
+
+- name: string;
+- in: string;
+- required: boolean;
+- description: string; // pre-rendered HTML
+- schema: string; // pre-rendered schema
+- type: string;
+- isArray: boolean;
+  
+-->
+
+<div class="operation-parameter">
+    <div class="operation-columns">
+        <div class="column-1">
+            {{name}}
+        </div>
+        <div class="column-2">
+            {{#if required}}Required{{else}}Optional{{/if}}
+        </div>
+        <div class="column-fill">
+            <div>{{{description}}}</div>
+            {{#if schema}}
+            {{#if isArray}}
+                <div class="parameter-description-label-comment">Each item of the array:</div>
+            {{/if}}
+            <pre>{{schema}}</pre>
+        {{/if}}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+<!-- 
+Template for single operation response.
+
+Available variables:
+- code: string;
+- description: string; // pre-rendered HTML
+- content: string; // pre-rendered HTML
+-->
+<div class="operation-response">
+    <div class="operation-columns">
+        <div class="column-1">
+            Response
+        </div>
+        <div class="column-fill">
+            {{code}} {{#if description}}{{{description}}}{{else}}No description available{{/if}}
+        </div>
+    </div>
+    {{{content}}}
+</div>

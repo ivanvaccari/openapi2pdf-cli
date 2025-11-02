@@ -1,0 +1,57 @@
+<!--
+
+Template for a single operation body in the API section.
+Available variables:
+
+- required: boolean;
+- description: pre-rendered HTML description of the body;
+- contentTypes: { contentType: string; schema: string }[];
+
+-->
+
+<div class="operation-body">
+    <div class="operation-columns">
+        <div class="column-1">
+            Required
+        </div>
+        <div class="column-fill">
+            {{#if required}}Yes{{else}}No{{/if}}
+        </div>
+    </div>
+
+    <div class="operation-columns">
+        <div class="column-1">
+            Description
+        </div>
+        <div class="column-fill">
+            {{#if description}}
+                {{{description}}}
+            {{else}}
+                No description available
+            {{/if}}
+        </div>
+    </div>
+    
+
+    
+    {{#if contentTypes}}
+        {{#each contentTypes}}
+        <div class="operation-columns">
+            <div class="column-1">
+                Content-type
+            </div>
+            <div class="column-fill">
+                {{contentType}}
+            </div>
+        </div>
+        <div class="operation-columns">
+            <div class="column-1">
+                Schema for {{contentType}}
+            </div>
+            <div class="column-fill">
+                <div class="operation-body-schema">{{{schema}}}</div>
+            </div>
+        </div>
+        {{/each}}
+    {{/if}}
+</div>

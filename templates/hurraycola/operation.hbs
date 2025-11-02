@@ -1,0 +1,71 @@
+<!--
+
+Single rest operation template.
+
+Available variables:
+- anchor: the HTML anchor for this operation
+- method: HTTP method (GET, POST, etc.)
+- path: the API path (e.g., /users/{id})
+- operation
+   - summary: brief description of the operation
+   - description: detailed description of the operation (in HTML)
+   - parameters: pre-rendered array of HTML for the parameters block. If no parameters, this may be undefined
+   - responses: pre-rendered array of HTML for the responses block. If no responses, this may be undefined
+   - requestBody: pre-rendered HTML for the request body block. If no request body, this may be undefined
+-->
+
+<div class="operation" id="{{anchor}}">
+    <h2>{{operation.summary}}</h2>
+
+    {{#if operation.description}}
+        <div class="operation-description">
+            <div>{{operation.description}}</div>
+        </div>
+    {{/if}}
+
+    <div class="operation-columns">
+        <div class="column-1">Method</div>
+        <div class="column-fill">{{method}}</div>
+    </div>
+        
+    <div class="operation-columns">
+        <div class="column-1">Path</div>
+        <div class="column-fill">{{path}}</div>
+    </div>
+  
+    
+
+    {{#if operation.parameters}}
+        <h4>Parameters</h4>
+        <div class="operation-parameters">
+
+            <div class="operation-columns operation-parameter-header">
+                <div class="column-1">Parameter</div>
+                <div class="column-2">About</div>
+                <div class="column-fill">Description</div>
+            </div>
+
+            {{#each operation.parameters}}
+                {{{this}}}
+            {{/each}}
+        </div>
+    {{/if}}
+
+    {{#if operation.requestBody}}
+        <h4>Request Body</h4>
+        <div class="operation-request-body">
+            {{{operation.requestBody}}}
+        </div>
+    {{/if}}
+
+    {{#if operation.responses}}
+        <h4>Responses</h4>
+        <div class="operation-responses">
+            <!-- this is a pre-rendered array of operation responses  -->
+            {{#each operation.responses}}
+                {{{this}}}
+            {{/each}}
+        </div>
+    {{/if}}
+</div>
+

@@ -1,0 +1,31 @@
+<!--
+Template for revisions page.
+
+Available variables:
+- metadata: the full object from the "metadata" field in the config file
+- openApiSpecJson: the full OpenAPI spec as a JSON object.
+
+This page is rendered after the frontpage
+-->
+<div class="revision-page">
+    <h3>Revisions</h3>
+    <table class="revision-table">
+        <tr class="revision-table-header">
+            <th>Date</th>
+            <th>Version</th>
+            <th>Author</th>
+            <th>Description</th>
+        </tr>
+        {{#each metadata.revisions}}
+        <tr class="revision-table-row">
+            <td>{{this.date}}</td>
+            <td>{{this.version}}</td>
+            <td>{{this.author}}</td>
+            <td>{{this.description}}</td>
+        </tr>
+    {{/each}}
+    </table>
+</div>
+
+<!-- jsreport page break. See https://jsreport.net/blog/pdf-report-paging-and-page-breaks -->
+<div class="page-break"></div>

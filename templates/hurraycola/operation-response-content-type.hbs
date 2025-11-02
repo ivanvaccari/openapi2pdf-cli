@@ -1,0 +1,16 @@
+<!-- 
+Template for render a single "content type" in an operation response.
+Available variables:
+- status: http status code
+- contentType: string;
+- content: pre-rendered HTML description of the content type;
+-->
+
+ <div class="operation-columns">
+    <div class="column-1">
+        {{contentType}} for status {{status}}
+    </div>
+    <div class="column-fill">
+        {{{content}}}
+    </div>
+</div>
