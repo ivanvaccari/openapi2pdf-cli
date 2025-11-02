@@ -52,7 +52,7 @@ module.exports = {
 
 `json` files directly contain the [ConfigFile](./src/types.ts) object.
 
-See an example configuration file here: [samples\openapi2pdf-test.config.js](./samples/openapi2pdf-test.config.js). The full set of available options is describet in [ConfigFile type](./src/types.ts) file.
+See an example configuration file here: [samples\openapi2pdf-test.config.js](./samples/openapi2pdf-test.config.js). The full set of available options is described in [ConfigFile type](./src/types.ts) file.
 
 ## Templates
 
@@ -71,6 +71,7 @@ The template directory must contain the following files:
 - `operation.hbs`: template for each operation (endpoint) of the API
 - `operation-parameter.hbs`: template for each parameter of an operation
 - `operation-response.hbs`: template for each response of an operation
+- `operation-body.hbs`: template for the request body of an operation
 - `operation-response-content-type.hbs`: template for each content type of a response
 - `style.scss`: stylesheet for the documentation.
 - `toc.hbs`: template for the table of contents

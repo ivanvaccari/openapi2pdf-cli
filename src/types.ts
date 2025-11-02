@@ -5,11 +5,13 @@ import { PaperFormat } from "puppeteer";
  */
 export type ConfigFile = {
     /**
-     * Template files directory. If provided, must be a reltive path directory.
-     * This first check for existence from cwd(), then checks for existence in local templates directory.
+     * Template files directory. If provided, the system checks, in this order:
+     * - presence of a relative directory with the provided name.
+     * - presence of built-in template with the provided name
+     * 
+     * Example: setting "postman", first check presence of "cwd()/postman" then checks "__dirname/templates/postman"
+     * 
      * If omitted, defaults to "postman".
-     *
-     * Example: "postman" if not found in cwd()/postman then checks in __dirname/templates/postman
      */
     template?: string;
 
