@@ -7,7 +7,7 @@ A cli tool to generate PDF documentation from OpenAPI specifications using custo
 - Reads OpenAPI specs from URL
 - Supports HTML and PDF output formats
 - Customizable templates using Handlebars
-- One built-in template for immediate use (inspired by [Postman](https://www.postman.com/))
+- Some built-in templates for immediate use (one inspired by [Postman](https://www.postman.com/), one inspired by other sources)
 
 ## Usage
 
