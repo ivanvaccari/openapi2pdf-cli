@@ -8,23 +8,31 @@ import puppeteer from "puppeteer";
  * @param configFile
  * @returns
  */
-export async function renderPdf(
-    content: RenderedHtmlContent,
-    configFile: ConfigFile,
-): Promise<Buffer> {
-    const browser = await puppeteer.launch();
+export async function renderPdf(content: RenderedHtmlContent, configFile: ConfigFile): Promise<Buffer> {
+    console.log("Launching puppeteer to render PDF");
+    console.log("This might take a while depending on the size of the document");
+    let elapsedSeconds = 0;
+
+    // 33.6 MB html -> 1500 seconds on my crappy laptop (for 50mb pdf )
+    const interval = setInterval(() => {
+        process.stdout.write(".");
+        elapsedSeconds++;
+        if (elapsedSeconds % 20 === 0) {
+            console.log(`Elapsed time: ${elapsedSeconds} seconds`);
+        }
+    }, 1000);
+
+    const browser = await puppeteer.launch({
+        protocolTimeout: configFile.pdfOptions?.timeout ?? 3600 * 1000, // default to 1 hour if not specified
+    });
     const page = await browser.newPage();
 
     await page.setContent(content.body);
 
     // Replace comments in header and footer. If empty, no header/footer will be rendered.
     const stripHtmlTagsRegex = /<!--[\s\S]*?(?:-->)/g;
-    const headerHtml = (content.header || "")
-        .replace(stripHtmlTagsRegex, "")
-        .trim();
-    const footerHtml = (content.footer || "")
-        .replace(stripHtmlTagsRegex, "")
-        .trim();
+    const headerHtml = (content.header || "").replace(stripHtmlTagsRegex, "").trim();
+    const footerHtml = (content.footer || "").replace(stripHtmlTagsRegex, "").trim();
 
     // Render the PDF
     const pdfBuffer = await page.pdf({
@@ -33,7 +41,8 @@ export async function renderPdf(
         headerTemplate: headerHtml,
         footerTemplate: footerHtml,
         displayHeaderFooter: !!(headerHtml || footerHtml),
-        timeout: 180000,
+        timeout: 3600 * 1000, // 1 hour timeout, basically ignore any timeout
+
         margin: {
             top: "15mm",
             right: "15mm",
@@ -45,5 +54,8 @@ export async function renderPdf(
 
     await browser.close();
 
-    return Buffer.from(pdfBuffer);
+    const buffer = Buffer.from(pdfBuffer);
+    clearInterval(interval);
+    console.log("Puppeteer has rendered the PDF");
+    return buffer;
 }
