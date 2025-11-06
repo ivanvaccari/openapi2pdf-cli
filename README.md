@@ -2,6 +2,11 @@
 
 A cli tool to generate PDF documentation from OpenAPI specifications using customizable templates.
 
+:warning: This is a work in progress. Use at your own risk.
+
+## TODO
+- [ ] Add security schemes rendering
+
 ## Features
 
 - Reads OpenAPI specs from URL
@@ -93,3 +98,6 @@ All template files are mandatory. If you don't want to render a specific section
 ## Examples
 
 See the [samples](./samples) directory for example configuration file and generated documentation.
+
+
+

@@ -23,6 +23,20 @@ Available variables:
         </div>
     {{/if}}
 
+
+    {{#if operation.security}}
+        <div class="operation-columns">
+            <div class="column-1">Security</div>
+            <div class="column-fill">
+                {{#each operation.security}}
+                    {{#each this}}
+                        <span class="operation-security-scheme">{{@key}}</span>
+                    {{/each}}
+                {{/each}}
+            </div>
+        </div>
+
+    {{/if}}
     <div class="operation-columns">
         <div class="column-1">Method</div>
         <div class="column-fill">{{method}}</div>
