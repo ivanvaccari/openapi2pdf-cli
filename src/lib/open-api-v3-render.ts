@@ -29,7 +29,7 @@ export class OpenApiV3Render {
     constructor(configFile: ConfigFile, templates: TemplateFiles, openApiSpecJson: OpenAPIV3.Document) {
         this.templates = templates;
         this.configFile = configFile;
-        this.openApiSpecJson = Object.freeze(openApiSpecJson);
+        this.openApiSpecJson = openApiSpecJson;
         // prepare some templates to be used during rendering
         this.operationTemplate = Handlebars.compile(this.templates.operation);
         this.operationParameterTemplate = Handlebars.compile(this.templates.operationParameter);
@@ -133,8 +133,16 @@ export class OpenApiV3Render {
      */
     private async processComponents(where: "schemas"): Promise<string> {
         const schemaHtmlLines: string[] = [];
-        for (const schemaName of Object.keys(this.openApiSpecJson.components?.[where] ?? {})) {
+
+        // The object changes while iterating, so i'm using a very discutible mode to iterate
+        // over an object that is being changed during iteration
+        while(true){
+            const schemaName = Object.keys(this.openApiSpecJson.components?.[where] ?? {})[0];
+            if(!schemaName) break;
+
+            // grab one schema and remove it from the list so that next iteration will get the next one
             const schema = this.openApiSpecJson.components?.[where]?.[schemaName];
+            delete this.openApiSpecJson.components?.[where]?.[schemaName];
 
             if (schema) {
                 const link = "#/components/schemas/" + schemaName;

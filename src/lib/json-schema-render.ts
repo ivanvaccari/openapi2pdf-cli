@@ -3,6 +3,14 @@ import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 import { sample as OpenApiSampler } from "openapi-sampler";
 import { marked } from "marked";
 
+/**
+ * Render a json schema to HTML
+ *
+ * NOTE: This might change in place the openApiSpecJson object. If a json schema recurse to other json schemas, those will be added to the openApiSpecJson components/schemas
+ * and the current schema will be modified to reference those schemas.
+ * This is done to prevent generation of really deep HTML for deeply nested schemas.
+ *
+ */
 export class JsonSchemaRender {
     /**
      *
@@ -78,9 +86,16 @@ export class JsonSchemaRender {
     }
 
     /**
-     *
+     * Iterate over the schema and generate the HTML
+     * 
+     * @param parents A series of strings that indicates the parent property or schema names. Also used to check for deep nesting
+     * @param name The name of the current schema
+     * @param link The link (id) of the current schema
+     * @param schemaOrReference The schema or reference object to render
+     * @returns An object with a boolean indicating if the schema was rendered as a sub-schema, and the generated HTML lines
      */
     private async iterate(
+        parents: string[],
         name: string,
         link: string,
         schemaOrReference:
@@ -88,14 +103,14 @@ export class JsonSchemaRender {
             | OpenAPIV3.ReferenceObject
             | OpenAPIV3_1.SchemaObject
             | OpenAPIV3_1.ReferenceObject,
-    ): Promise<string[]> {
+    ): Promise<{ sub: boolean; html: string[] }> {
         const html: string[] = [];
 
         if ((schemaOrReference as OpenAPIV3.ReferenceObject).$ref) {
             const ref = (schemaOrReference as OpenAPIV3.ReferenceObject).$ref;
             const schemaName = this.getSchemaNameByRef(ref);
             html.push(`See referenced schema <a href="${ref}">${schemaName}</a>`);
-            return html;
+            return { sub: false, html: html };
         }
 
         // From now on, we can assume it's a schema object
@@ -106,12 +121,47 @@ export class JsonSchemaRender {
             for (let i = 0; i < schema.oneOf.length; i++) {
                 const oneSchema = schema.oneOf[i];
                 if (!oneSchema) continue;
-                html.push(`<div class='schema-oneof-index'>Option ${i + 1}:</div>`);
-                html.push("<div class='schema-oneof'>");
-                html.push(...(await this.iterate("", "", oneSchema)));
-                html.push("</div>"); // end of schema-oneof
+
+                const result = await this.iterate(parents, "", "", oneSchema);
+                if (result.sub) {
+                    html.push(`<div class='schema-oneof-index'>Option ${i + 1}:</div>`);
+                    html.push("<div class='schema-oneof'>");
+                    html.push(...result.html);
+                    html.push("</div>"); // end of schema-oneof
+                } else {
+                    html.push(...result.html);
+                }
             }
-            return html;
+            return { sub: false, html: html };
+        }
+
+        /**
+         * Handle array types
+         */
+        if ((schema.type==='array') && schema.items){
+            const result = await this.iterate(parents, "", "", schema.items);
+            html.push(`(Array of following)`);
+            html.push(...result.html);
+            return {sub: false, html: html}
+        }
+
+        // Don't go too deep, instead create a new schema in components/schemas and reference it
+        if (parents.length > 2) {
+            this.openApiSpecJson.components = this.openApiSpecJson.components || {};
+            this.openApiSpecJson.components.schemas = this.openApiSpecJson.components.schemas || {};
+
+            let schemaRefLink = `#/components/schemas/${name}`;
+            if (!this.openApiSpecJson.components.schemas[name]) {
+                const composedSchemaName = [...parents].join("_").replace(/ /g,'_');
+                this.openApiSpecJson.components.schemas[composedSchemaName] = schemaOrReference;
+                schemaRefLink = `#/components/schemas/${composedSchemaName}`;
+            }
+
+            html.push(`See referenced schema AAAAAAAAAAAAAA <a href="${schemaRefLink}">${name}</a>`);
+            return {
+                sub: false,
+                html: html,
+            };
         }
 
         // try to generate a sample.
@@ -128,7 +178,11 @@ export class JsonSchemaRender {
 
         html.push("<div class='schema'>");
         html.push("   <div class='schema-header'>");
-        html.push(`      <div class='schema-title' id=${link.replace("#", "")}>${name}</div>`);
+        if(name) {
+            html.push(`      <div class='schema-title' id='${link.replace("#", "")}'>${name}</div>`);
+        }else{
+            console.log("QUI")
+        }
         html.push(`      <div class='schema-type'>Type: ${schema.type}</div>`);
         html.push("   </div>"); // end of schema-header
 
@@ -138,28 +192,28 @@ export class JsonSchemaRender {
 
         // Render properties
         if (Object.keys(schema.properties ?? {}).length > 0) {
-            html.push(...(await this.renderProperties(0, schema)));
+            html.push(...(await this.renderProperties([...parents], schema)));
         }
 
         // end of "schema"
         html.push("</div>"); // end of schema
-        return html;
+        return { sub: true, html: html };
     }
 
     /**
      *
-     * @param schema
+     * @param parents A seies of strings that indicates the parent property or schema names. Also used to check for deep nesting
      * @returns
      */
-    private async renderProperties(level: number, schema?: OpenAPIV3.SchemaObject): Promise<string[]> {
+    private async renderProperties(parents: string[], schema?: OpenAPIV3.SchemaObject): Promise<string[]> {
         if (!schema) return [];
         if (Object.keys(schema?.properties || {}).length === 0) return [];
 
         const html: string[] = [];
 
-        const header = level === 0 ? "Properties" : "Sub-properties";
-        const headerClass = level === 0 ? "schema-properties-title" : "schema-sub-properties-title";
-        const padderClass = level === 0 ? "" : "properties-padder";
+        const header = parents.length === 1 ? "Properties" : "Sub-properties";
+        const headerClass = parents.length === 1 ? "schema-properties-title" : "schema-sub-properties-title";
+        const padderClass = parents.length === 1 ? "" : "properties-padder";
         html.push(`<div class='${padderClass}'>`);
         html.push(`    <div class='${headerClass}'>${header}</div>`);
         html.push("    <div class='schema-properties'>");
@@ -203,10 +257,8 @@ export class JsonSchemaRender {
                     html.push(`<div class='schema-property-schema'><pre>${restOfSchemaJson}</pre></div>`);
                 }
             } else {
-                const description = isRef ? "" : (await this.renderMarkdown(propertySchemaObj.description) ?? "No description");
-                html.push(
-                    `<div class='schema-property-description'>${description}</div>`,
-                );
+                const description = await this.renderMarkdown(propertySchemaObj.description);
+                html.push(`<div class='schema-property-description'>${description}</div>`);
 
                 const subProperties = propertySchemaObj.properties;
                 const items = propertySchemaObj.type === "array" ? propertySchemaObj.items : undefined;
@@ -227,15 +279,23 @@ export class JsonSchemaRender {
 
                 // recursively render sub-properties
                 if (subProperties && Object.keys(subProperties).length > 0) {
-                    html.push(...(await this.renderProperties(level + 1, propertySchemaObj)));
+                    html.push(...(await this.renderProperties([...parents, propertyName], propertySchemaObj)));
                 }
 
                 if (items) {
-                    html.push("<div class='schema-property-items'>");
-                    html.push("<div class='properties-padder sub-schema'>");
-                    html.push(...(await this.iterate("Each array item", "", items)));
-                    html.push("</div>"); // end of properties-padder
-                    html.push("</div>"); // end of schema-property-items
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const title = (items as any).title ?? ("Items of " + propertyName);
+                    
+                    const result = await this.iterate([...parents, propertyName], title, "", items);
+                    if (result.sub) {
+                        html.push("<div class='schema-property-items'>");
+                        html.push("<div class='properties-padder sub-schema'>");
+                        html.push(...result.html);
+                        html.push("</div>"); // end of properties-padder
+                        html.push("</div>"); // end of schema-property-items
+                    } else {
+                        html.push(...result.html);
+                    }
                 }
             }
 
@@ -257,9 +317,10 @@ export class JsonSchemaRender {
     public async render(): Promise<string> {
         try {
             // Render the schema using the fullSchema context
-            const html = await this.iterate(this.name, this.link, this.schema);
+            const result = await this.iterate([this.name], this.name, this.link, this.schema);
 
-            return html.join("\n");
+            return result.html.join("\n");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Error rendering schema", this.name, error?.message);
             return `<div class='schema-error'>Error rendering schema ${this.name}: ${this.escapeHtml(error?.message)}</div>`;
