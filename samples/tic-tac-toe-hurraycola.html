@@ -26,7 +26,7 @@
   --size-h3: 140%;
   --size-h4: 120%;
   --column-1-width: 200px;
-  --column-2-width: 200px;
+  --column-2-width: 250px;
 }
 
 html,
@@ -86,7 +86,7 @@ h4 {
   color: var(--text-color-description);
 }
 .front-page .current-version {
-  margin-top: 800px;
+  margin-top: 650px;
   color: #333;
 }
 
@@ -296,12 +296,12 @@ pre {
   max-width: var(--column-1-width);
 }
 .schema .schema-properties-header .schema-property-required {
-  min-width: calc(var(--column-2-width) / 2);
-  max-width: calc(var(--column-2-width) / 2);
+  min-width: calc(var(--column-2-width) / 3);
+  max-width: calc(var(--column-2-width) / 3);
 }
 .schema .schema-properties-header .schema-property-type {
-  min-width: calc(var(--column-2-width) / 2);
-  max-width: calc(var(--column-2-width) / 2);
+  min-width: calc(var(--column-2-width) / 3 * 2);
+  max-width: calc(var(--column-2-width) / 3 * 2);
 }
 .schema .schema-properties-header .schema-property-description {
   flex-grow: 1;
@@ -321,12 +321,12 @@ pre {
   max-width: var(--column-1-width);
 }
 .schema .schema-property .schema-property-required {
-  min-width: calc(var(--column-2-width) / 2);
-  max-width: calc(var(--column-2-width) / 2);
+  min-width: calc(var(--column-2-width) / 3);
+  max-width: calc(var(--column-2-width) / 3);
 }
 .schema .schema-property .schema-property-type {
-  min-width: calc(var(--column-2-width) / 2);
-  max-width: calc(var(--column-2-width) / 2);
+  min-width: calc(var(--column-2-width) / 3 * 2);
+  max-width: calc(var(--column-2-width) / 3 * 2);
 }
 .schema .schema-property .schema-property-description-container {
   flex-grow: 1;
@@ -467,7 +467,7 @@ This page is rendered after "revisions" and before "authentication" page.
 
 
         
-        <b><a href='https://swagger.io/specification/'>OpenAPI</a> JSON</b>: <br><br>
+        <b><a href='https://swagger.io/specification/'>OpenAPI</a> JSON</b>: https://raw.githubusercontent.com/OAI/learn.openapis.org/refs/heads/main/examples/v3.1/tictactoe.json<br><br>
         
     </div>
 </div>
@@ -605,10 +605,19 @@ Available variables:
 -->
 
 <div class="operation" id="get--board">
-    <h2>Get the whole board</h2>
+    <h3>Get the whole board</h3>
 
         <div class="operation-description">
             <div>Retrieves the current state of the board and the winner.</div>
+        </div>
+
+
+        <div class="operation-columns">
+            <div class="column-1">Security</div>
+            <div class="column-fill">
+                        <span class="operation-security-scheme">defaultApiKey</span>
+                        <span class="operation-security-scheme">app2AppOauth</span>
+            </div>
         </div>
 
     <div class="operation-columns">
@@ -655,7 +664,7 @@ Available variables:
 
  <div class="operation-columns">
     <div class="column-1">
-        application/json for status 200
+        - application/json 
     </div>
     <div class="column-fill">
         See referenced schema <a href="#/components/schemas/status">status</a>
@@ -685,10 +694,19 @@ Available variables:
 -->
 
 <div class="operation" id="get--board-{row}-{column}">
-    <h2>Get a single board square</h2>
+    <h3>Get a single board square</h3>
 
         <div class="operation-description">
             <div>Retrieves the requested square.</div>
+        </div>
+
+
+        <div class="operation-columns">
+            <div class="column-1">Security</div>
+            <div class="column-fill">
+                        <span class="operation-security-scheme">bearerHttpAuthentication</span>
+                        <span class="operation-security-scheme">user2AppOauth</span>
+            </div>
         </div>
 
     <div class="operation-columns">
@@ -735,7 +753,7 @@ Available variables:
 
  <div class="operation-columns">
     <div class="column-1">
-        application/json for status 200
+        - application/json 
     </div>
     <div class="column-fill">
         See referenced schema <a href="#/components/schemas/mark">mark</a>
@@ -771,7 +789,7 @@ Available variables:
 
  <div class="operation-columns">
     <div class="column-1">
-        text/html for status 400
+        - text/html 
     </div>
     <div class="column-fill">
         See referenced schema <a href="#/components/schemas/errorMessage">errorMessage</a>
@@ -801,10 +819,19 @@ Available variables:
 -->
 
 <div class="operation" id="put--board-{row}-{column}">
-    <h2>Set a single board square</h2>
+    <h3>Set a single board square</h3>
 
         <div class="operation-description">
             <div>Places a mark on the board and retrieves the whole board and the winner (if any).</div>
+        </div>
+
+
+        <div class="operation-columns">
+            <div class="column-1">Security</div>
+            <div class="column-fill">
+                        <span class="operation-security-scheme">bearerHttpAuthentication</span>
+                        <span class="operation-security-scheme">user2AppOauth</span>
+            </div>
         </div>
 
     <div class="operation-columns">
@@ -864,7 +891,7 @@ Available variables:
         </div>
         <div class="operation-columns">
             <div class="column-1">
-                Schema for application/json
+                - Schema
             </div>
             <div class="column-fill">
                 <div class="operation-body-schema">See referenced schema <a href="#/components/schemas/mark">mark</a></div>
@@ -903,7 +930,7 @@ Available variables:
 
  <div class="operation-columns">
     <div class="column-1">
-        application/json for status 200
+        - application/json 
     </div>
     <div class="column-fill">
         See referenced schema <a href="#/components/schemas/status">status</a>
@@ -939,7 +966,7 @@ Available variables:
 
  <div class="operation-columns">
     <div class="column-1">
-        text/html for status 400
+        - text/html 
     </div>
     <div class="column-fill">
         See referenced schema <a href="#/components/schemas/errorMessage">errorMessage</a>
@@ -971,69 +998,70 @@ This section is rendered before last page.
     <div class="schemas-content">
         <div class='schema'>
    <div class='schema-header'>
-      <div class='schema-title' id=/components/schemas/errorMessage>errorMessage</div>
+      <div class='schema-title' id='/components/schemas/errorMessage'>errorMessage</div>
       <div class='schema-type'>Type: string</div>
    </div>
-<div class='schema-sample'>Example:<br><pre>"string"</pre></div>
+<div class='schema-sample'>Example:<br><pre>&quot;string&quot;</pre></div>
 </div>
 <div class='schema'>
    <div class='schema-header'>
-      <div class='schema-title' id=/components/schemas/coordinate>coordinate</div>
+      <div class='schema-title' id='/components/schemas/coordinate'>coordinate</div>
       <div class='schema-type'>Type: integer</div>
    </div>
 <div class='schema-sample'>Example:<br><pre>1</pre></div>
 </div>
 <div class='schema'>
    <div class='schema-header'>
-      <div class='schema-title' id=/components/schemas/mark>mark</div>
+      <div class='schema-title' id='/components/schemas/mark'>mark</div>
       <div class='schema-type'>Type: string</div>
    </div>
-<div class='schema-sample'>Example:<br><pre>"."</pre></div>
+<div class='schema-sample'>Example:<br><pre>&quot;.&quot;</pre></div>
 </div>
+(Array of following)
+(Array of following)
+See referenced schema <a href="#/components/schemas/mark">mark</a>
 <div class='schema'>
    <div class='schema-header'>
-      <div class='schema-title' id=/components/schemas/board>board</div>
-      <div class='schema-type'>Type: array</div>
-   </div>
-</div>
-<div class='schema'>
-   <div class='schema-header'>
-      <div class='schema-title' id=/components/schemas/winner>winner</div>
+      <div class='schema-title' id='/components/schemas/winner'>winner</div>
       <div class='schema-type'>Type: string</div>
    </div>
-<div class='schema-sample'>Example:<br><pre>"."</pre></div>
+<div class='schema-sample'>Example:<br><pre>&quot;.&quot;</pre></div>
 </div>
 <div class='schema'>
    <div class='schema-header'>
-      <div class='schema-title' id=/components/schemas/status>status</div>
+      <div class='schema-title' id='/components/schemas/status'>status</div>
       <div class='schema-type'>Type: object</div>
    </div>
 <div class=''>
-<div class='schema-properties-title'>Properties</div>
-<div class='schema-properties'>
-<div class='schema-properties-header'>
-  <div class='schema-property-name'>Name</div>
-  <div class='schema-property-required'>Required</div>
-  <div class='schema-property-type'>Type</div>
-  <div class='schema-property-description'>Description</div>
-</div>
-<div class='schema-property'>
-<div class='schema-property-name'>winner</div>
-<div class='schema-property-required'></div>
-<div class='schema-property-type'> </div>
-<div class='schema-property-description-container'>
-<div class='schema-property-description'>Winner of the game. <code>.</code> means nobody has won yet.<br><br>See referenced schema <a href="#/components/schemas/winner">winner</a></div>
-</div>
-</div>
-<div class='schema-property'>
-<div class='schema-property-name'>board</div>
-<div class='schema-property-required'></div>
-<div class='schema-property-type'> </div>
-<div class='schema-property-description-container'>
+    <div class='schema-properties-title'>Properties</div>
+    <div class='schema-properties'>
+        <div class='schema-properties-header'>
+            <div class='schema-property-name'>Name</div>
+            <div class='schema-property-required'>Required</div>
+            <div class='schema-property-type'>Type</div>
+            <div class='schema-property-description'>Description</div>
+        </div>
+        <div class='schema-property'>
+            <div class='schema-property-name'>winner</div>
+            <div class='schema-property-required'>
+                
+            </div>
+            <div class='schema-property-type'> </div>
+            <div class='schema-property-description-container'>
+<div class='schema-property-description'><br><br>See referenced schema <a href="#/components/schemas/winner">winner</a></div>
+            </div>
+        </div>
+        <div class='schema-property'>
+            <div class='schema-property-name'>board</div>
+            <div class='schema-property-required'>
+                
+            </div>
+            <div class='schema-property-type'> </div>
+            <div class='schema-property-description-container'>
 <div class='schema-property-description'><br><br>See referenced schema <a href="#/components/schemas/board">board</a></div>
-</div>
-</div>
-</div>
+            </div>
+        </div>
+    </div>
 </div>
 </div>
     </div>

@@ -157,7 +157,7 @@ export class JsonSchemaRender {
                 schemaRefLink = `#/components/schemas/${composedSchemaName}`;
             }
 
-            html.push(`See referenced schema AAAAAAAAAAAAAA <a href="${schemaRefLink}">${name}</a>`);
+            html.push(`See referenced schema <a href="${schemaRefLink}">${name}</a>`);
             return {
                 sub: false,
                 html: html,
@@ -180,8 +180,6 @@ export class JsonSchemaRender {
         html.push("   <div class='schema-header'>");
         if(name) {
             html.push(`      <div class='schema-title' id='${link.replace("#", "")}'>${name}</div>`);
-        }else{
-            console.log("QUI")
         }
         html.push(`      <div class='schema-type'>Type: ${schema.type}</div>`);
         html.push("   </div>"); // end of schema-header
