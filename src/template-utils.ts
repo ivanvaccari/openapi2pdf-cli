@@ -30,51 +30,55 @@ export const templateFilenames: TemplateFiles = {
 };
 
 /**
- * Find the path where the template is located.
- * If not provided, use the default built-in template "postman"
- *
- * @param templatePath
- * @returns
- */
-export async function findTemplatePath(templatePath?: string): Promise<string> {
-    if (!templatePath) {
-        return path.join(__dirname, "../templates/postman");
-    }
-
-    // try to find template in current working directory
-    let _tmp = path.join(process.cwd(), templatePath);
-    try {
-        await fs.stat(_tmp);
-        return _tmp;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-        // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
-    }
-
-    // try to find template in built-in templates directory
-    _tmp = path.join(__dirname, "../templates/", templatePath);
-    try {
-        await fs.stat(_tmp);
-        return _tmp;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-        // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
-    }
-
-    throw new Error(`Template ${templatePath} not found in cwd() or built-in templates`);
-}
-
-/**
  * Load the template files content from the given template path
  * @param templatePath
  * @returns
  */
-export async function loadTemplateFiles(templatePath: string): Promise<TemplateFiles> {
-    const templates: TemplateFiles = { ...templateFilenames };
+export async function loadTemplateFiles(configFile: ConfigFile): Promise<TemplateFiles> {
 
-    const _loadFile = async (filename: string): Promise<string> => {
-        return fs.readFile(path.join(templatePath, filename)).then((data) => data.toString());
+    console.log("Loading template files...");
+    // default to "postman" template if not provided
+    if (!configFile.template) {
+        console.warn(`No template specified, falling back to "postman"`);
+        configFile.template = "postman";
+    }
+
+    const testPaths: string[] = [];
+
+    try {
+        const _tmp = path.join(process.cwd(), configFile.template);
+        await fs.stat(_tmp);
+        testPaths.push(_tmp);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+        // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
+    }
+
+    try {
+        const _tmp = path.join(__dirname, "../templates/", configFile.template);
+        await fs.stat(_tmp);
+        testPaths.push(_tmp);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+        // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
+    }
+
+    const _findFilePath = async (templateName: string): Promise<string> => {
+        for (const testPath of testPaths) {
+            const fullPath = path.join(testPath, templateName);
+            try {
+                await fs.stat(fullPath);
+                console.log(`Found template ${templateName} at ${fullPath}`);
+                return fullPath;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (err) {
+                // eslint says "empty block statement". Well, this comment makes it not empty anymore ...eheheh
+            }
+        }
+        throw new Error(`Template ${templateName} not found in any of the template paths tried`);
     };
+
+    const templates: TemplateFiles = { ...templateFilenames };
 
     // load the templates
     for (const _key in templates) {
@@ -82,13 +86,17 @@ export async function loadTemplateFiles(templatePath: string): Promise<TemplateF
 
         // Ignore style here, it will be processed later
         if (key === "style") continue;
-        templates[key] = await _loadFile(templates[key]);
+
+        const contentBuffer = await fs.readFile(await _findFilePath(templates[key]));
+        templates[key] = contentBuffer.toString();
     }
 
-    // Use sass to compile style.scss to css
-    templates.style = compile(path.join(templatePath, templates.style)).css;
+    // Try to load and process style
+    // Use sass to compile style to css
+    const cssFilePath = await _findFilePath(templates.style);
+    templates.style = compile(cssFilePath).css;
 
-    templatePath = templatePath.replace(/\//g, "\\");
+    // templatePath = templatePath.replace(/\//g, "\\");
 
     // resolves "url(...)" in css to base64 data urls
     // url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...)
@@ -98,11 +106,15 @@ export async function loadTemplateFiles(templatePath: string): Promise<TemplateF
     for (const match of matcher) {
         const originalUrl = match[1];
         if (originalUrl) {
-            const fileBufer = await fs.readFile(path.join(templatePath, originalUrl));
-            const base64Data = fileBufer.toString("base64");
-            const ext = path.extname(originalUrl).substring(1);
-            const dataUrl = `data:image/${ext};base64,${base64Data}`;
-            templates.style = templates.style.replace(originalUrl, dataUrl);
+            try {
+                const fileBufer = await fs.readFile(await _findFilePath(originalUrl));
+                const base64Data = fileBufer.toString("base64");
+                const ext = path.extname(originalUrl).substring(1);
+                const dataUrl = `data:image/${ext};base64,${base64Data}`;
+                templates.style = templates.style.replace(originalUrl, dataUrl);
+            } catch (err: any) {
+                console.warn(`Warning: could not resolve url(${originalUrl}): ${err.message}`);
+            }
         }
     }
 
@@ -116,11 +128,15 @@ export async function loadTemplateFiles(templatePath: string): Promise<TemplateF
         for (const match of imgMatcher) {
             const originalSrc = match[1];
             if (originalSrc) {
-                const fileBufer = await fs.readFile(path.join(templatePath, originalSrc));
-                const base64Data = fileBufer.toString("base64");
-                const ext = path.extname(originalSrc).substring(1);
-                const dataUrl = `data:image/${ext};base64,${base64Data}`;
-                templates[key] = templates[key].replace(originalSrc, dataUrl);
+                try {
+                    const fileBufer = await fs.readFile(await _findFilePath(originalSrc));
+                    const base64Data = fileBufer.toString("base64");
+                    const ext = path.extname(originalSrc).substring(1);
+                    const dataUrl = `data:image/${ext};base64,${base64Data}`;
+                    templates[key] = templates[key].replace(originalSrc, dataUrl);
+                } catch (err: any) {
+                    console.warn(`Warning: could not resolve <img src="${originalSrc}">: ${err.message}`);
+                }
             }
         }
     }
@@ -195,6 +211,7 @@ export async function renderHtml(
     const body = template({
         metadata: configFile.metadata,
         openApiSpecJson: openApiSpecJson,
+        openapiJsonPath: configFile.openapiJsonPath,
     });
 
     const header = Handlebars.compile(templates.header)({

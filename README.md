@@ -32,6 +32,8 @@ npm run build
 npm link
 ```
 
+Note: the `npm link` command makes the `openapi2pdf` command available globally on your system. You can skip this step and run the tool using `npx openapi2pdf-cli --config openapi2pdf.config.js` instead (from the project root directory).
+
 ### Run the generator
 
 To run the tool, use the following command:
@@ -64,13 +66,17 @@ See an example configuration file here: [samples\openapi2pdf-test.config.js](./s
 
 This tool uses handlebars templates to generate the documentation. The template is composed of multiple files, each one responsible for rendering a specific section of the documentation.
 
-This tool provides the following built-in templates:
+The following templates are available out of the box:
 - `postman`,  inspired by the Postman documentation style
 - `hurraycola`, inspired by some random documents found online
 
 Omitting the `template` option in the configuration file will use the `postman` built-in template.
 
-You can use your own template by specifying the `template` option in the configuration file with the path (relative to the config file) to your template directory. The template directory must contain the following files:
+You can customize the templates in two ways:
+- define your own template directory in your working directory (eg: where the config file is located), in which you must specify **all** the required template files. Set the relative path of the template directory in the `template` option of the configuration file.
+- define a directory with the same name of a built-in template (e.g. `postman` or `hurraycola`) in your working directory (eg: where the config file is located), and override only the files you want to customize. The other files will be taken from the built-in template. Set the name of the built-in template in the `template` option of the configuration file,
+
+Based on your case, you can use one of the built-in templates as a starting point and customize it to your needs. The following files are defined in each template:
 
 - `api.hbs`: template for the "Rest Api" page, which includes all the operations
 - `assumptions.hbs`: template for the "Assumptions" page, that you can use to describe any assumption made in the API design or to add custom notes after the `frontpage.hbs` content.
@@ -91,9 +97,6 @@ You can use your own template by specifying the `template` option in the configu
 - `summary.hbs`: template for the summary page of the documentation
 - `revisions.hbs`: template for the revisions page of the documentation
 
-You can use one of the built-in templates as a starting point to create your own custom templates.
-
-All template files are mandatory. If you don't want to render a specific section, create an empty file.
 
 ## Examples
 

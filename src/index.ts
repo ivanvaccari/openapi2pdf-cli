@@ -3,7 +3,7 @@
 import { program } from "commander";
 import { loadConfigFile, mergeConfigFileMetadata } from "./config-file";
 import fs from "fs";
-import { findTemplatePath, loadTemplateFiles, renderHtml } from "./template-utils";
+import { loadTemplateFiles, renderHtml } from "./template-utils";
 import { renderPdf } from "./render-pdf";
 import { loadOpenApiJson } from "./lib/load-open-api-json";
 
@@ -25,8 +25,8 @@ async function run() {
     // Validate required fields in config file
     if (!configFile.openapiJsonPath) throw new Error("openapiJsonPath is required in config file");
 
-    // Find template path
-    const templatePath = await findTemplatePath(configFile.template);
+    // Load the template files so they're ready to be used
+    const templates = await loadTemplateFiles(configFile);
 
     // fetch OpenAPI specification
     console.log(`Loading OpenAPI specification from ${configFile.openapiJsonPath}...`);
@@ -46,8 +46,7 @@ async function run() {
         throw new Error("OpenAPI specification is empty");
     }
 
-    // Load the template files so the're ready to be used
-    const templates = await loadTemplateFiles(templatePath);
+
 
     // start to render the html.
     const renderedContent = await renderHtml(configFile, templates, openApiSpecJson);

@@ -56,6 +56,7 @@ export async function renderPdf(content: RenderedHtmlContent, configFile: Config
 
     const buffer = Buffer.from(pdfBuffer);
     clearInterval(interval);
-    console.log("Puppeteer has rendered the PDF");
+    console.log("");
+    console.log("PDF render completed ");
     return buffer;
 }
