@@ -1,14 +1,29 @@
 /**
  * Example cofig file for openapi2pdf-cli
  * 
+ * Uses https://api.apis.guru/v2/specs/ably.io/platform/1.1.0/openapi.json as OpenAPI source
+ * 
  * For file format, see: https://github.com/ivanvaccari/openapi2pdf-cli/blob/d4fe275d8bcd8a91f0ef3e79a0094c3bc6acda30/src/types.ts#L6
  */
 
 
 module.exports = {
     template: "hurraycola",
-    openapiJsonPath: "https://raw.githubusercontent.com/OAI/learn.openapis.org/refs/heads/main/examples/v3.1/tictactoe.json",
+    openapiJsonPath: "https://api.apis.guru/v2/specs/1password.local/connect/1.5.7/openapi.json", // 1password
     metadata:{
+
+        // swaggerUrl: "https://petstore.swagger.io",
+        /*
+        If set, these fields will override the corresponding fields from the OpenAPI spec
+        info: {
+            title:  "Swagger Petstore",
+            description: "A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification",
+            version: "1.0.0",
+        },
+        servers: [{
+            url: "https://petstore.swagger.io/v2"
+        }],
+        */
         revisions: [{
                 version:'1.0.0',
                 date: '2024-06-01',
@@ -41,10 +56,11 @@ module.exports = {
             left: "10mm"
         },
         format: "A4",
-        scale: 0.80
+        scale: 0.8,
+        preferCSSPageSize: false
     },
     outputFiles: {
-        pdf: "tic-tac-toe-hurraycola.pdf",
-        html: "tic-tac-toe-hurraycola.html"
+        pdf: "1password-hurraycola.pdf",
+        html: "1password-hurraycola.html"
     }
 }

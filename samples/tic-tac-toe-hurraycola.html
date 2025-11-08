@@ -1,6 +1,20 @@
 <html>
 <head>
 <style>
+
+            @media print {
+                html, body {
+                    width: 265.5mm !important;
+                    max-width: 374.25mm !important;
+                    overflow-x: auto !important;
+                }
+                /** {
+                    max-width: 100% !important;
+                    word-wrap: break-word !important;
+                    overflow-wrap: break-word !important;
+                }*/
+            }
+        
 /**
 * CSS styles for the Postman template.
 * This file is processed with SASS before being applied.
@@ -15,6 +29,7 @@
   --dark-4: #999999;
   --secondary: #960000;
   --main-title: #555555;
+  --danger: #960000;
   --revisions-table-header-bg: var(--bg-light);
   --revisions-table-border: var(--border-light);
   --text-color-description: #444444;
@@ -112,6 +127,11 @@ h4 {
 /**
 * Summary page styles
 */
+.required {
+  color: var(--danger);
+  font-weight: bold;
+}
+
 /**
 * Rest operation styles
 */
@@ -134,10 +154,12 @@ h4 {
 }
 .operation .operation-columns .column-1 {
   font-weight: bold;
-  width: var(--column-1-width);
+  max-width: var(--column-1-width) !important;
+  min-width: var(--column-1-width) !important;
 }
 .operation .operation-columns .column-2 {
-  width: var(--column-2-width);
+  max-width: var(--column-2-width) !important;
+  min-width: var(--column-2-width) !important;
 }
 .operation .operation-columns .column-fill {
   flex-grow: 1;
@@ -295,14 +317,6 @@ pre {
   min-width: var(--column-1-width);
   max-width: var(--column-1-width);
 }
-.schema .schema-properties-header .schema-property-required {
-  min-width: calc(var(--column-2-width) / 3);
-  max-width: calc(var(--column-2-width) / 3);
-}
-.schema .schema-properties-header .schema-property-type {
-  min-width: calc(var(--column-2-width) / 3 * 2);
-  max-width: calc(var(--column-2-width) / 3 * 2);
-}
 .schema .schema-properties-header .schema-property-description {
   flex-grow: 1;
 }
@@ -319,14 +333,6 @@ pre {
   font-weight: bold;
   min-width: var(--column-1-width);
   max-width: var(--column-1-width);
-}
-.schema .schema-property .schema-property-required {
-  min-width: calc(var(--column-2-width) / 3);
-  max-width: calc(var(--column-2-width) / 3);
-}
-.schema .schema-property .schema-property-type {
-  min-width: calc(var(--column-2-width) / 3 * 2);
-  max-width: calc(var(--column-2-width) / 3 * 2);
 }
 .schema .schema-property .schema-property-description-container {
   flex-grow: 1;
@@ -1037,28 +1043,30 @@ See referenced schema <a href="#/components/schemas/mark">mark</a>
     <div class='schema-properties'>
         <div class='schema-properties-header'>
             <div class='schema-property-name'>Name</div>
-            <div class='schema-property-required'>Required</div>
-            <div class='schema-property-type'>Type</div>
             <div class='schema-property-description'>Description</div>
         </div>
         <div class='schema-property'>
             <div class='schema-property-name'>winner</div>
-            <div class='schema-property-required'>
-                
-            </div>
-            <div class='schema-property-type'> </div>
             <div class='schema-property-description-container'>
-<div class='schema-property-description'><br><br>See referenced schema <a href="#/components/schemas/winner">winner</a></div>
+<div class='schema-property-description'>
+                      
+                      <span> </span>
+                      
+                      <br><br>
+                      See referenced schema <a href="#/components/schemas/winner">winner</a>
+                    </div>
             </div>
         </div>
         <div class='schema-property'>
             <div class='schema-property-name'>board</div>
-            <div class='schema-property-required'>
-                
-            </div>
-            <div class='schema-property-type'> </div>
             <div class='schema-property-description-container'>
-<div class='schema-property-description'><br><br>See referenced schema <a href="#/components/schemas/board">board</a></div>
+<div class='schema-property-description'>
+                      
+                      <span> </span>
+                      
+                      <br><br>
+                      See referenced schema <a href="#/components/schemas/board">board</a>
+                    </div>
             </div>
         </div>
     </div>
