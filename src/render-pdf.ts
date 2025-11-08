@@ -27,6 +27,14 @@ export async function renderPdf(content: RenderedHtmlContent, configFile: Config
     });
     const page = await browser.newPage();
 
+     // Set viewport to prevent auto-scaling
+    /*await page.setViewport({
+        width: 794,   // A4 width in pixels at 96 DPI
+        height: 1123, // A4 height in pixels at 96 DPI
+        deviceScaleFactor: 1,
+    });*/
+
+
     await page.setContent(content.body);
 
     // Replace comments in header and footer. If empty, no header/footer will be rendered.

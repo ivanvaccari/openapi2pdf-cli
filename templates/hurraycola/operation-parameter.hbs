@@ -17,17 +17,17 @@ Available variables:
         <div class="column-1">
             {{name}}
         </div>
-        <div class="column-2">
-            {{#if required}}Required{{else}}Optional{{/if}}
-        </div>
         <div class="column-fill">
-            <div>{{{description}}}</div>
+            <div>
+                {{#if required}}<span class="required">Required, </span>{{else}}Optional, {{/if}}
+                {{{description}}}
+            </div>
             {{#if schema}}
-            {{#if isArray}}
-                <div class="parameter-description-label-comment">Each item of the array:</div>
-            {{/if}}
+                {{#if isArray}}
+                    <div class="parameter-description-label-comment">Each item of the array:</div>
+                {{/if}}
             <pre>{{schema}}</pre>
-        {{/if}}
+            {{/if}}
         </div>
     </div>
 </div>

@@ -6,6 +6,7 @@ import { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 import { OpenApiV3Render } from "./lib/open-api-v3-render";
 import { compile } from "sass";
 import { OpenApiV3_1Render } from "./lib/open-api-v3_1-render";
+import { paperSizes } from "./lib/paper-sizes";
 
 export const templateFilenames: TemplateFiles = {
     style: "style.scss",
@@ -183,11 +184,42 @@ export async function renderHtml(
             throw new Error(`OpenAPI version ${openApiSpecJson.openapi} not supported`);
     }
 
+    // Add CSS to prevent auto-scaling
+    // format is A4 by default
+    const format = (configFile.pdfOptions?.format || "A4") as keyof typeof paperSizes;
+    const scale = configFile.pdfOptions?.scale || 1;
+    const pageFormat = paperSizes[format]
+    if (!pageFormat) {
+        throw new Error(`Unsupported paper format: ${format}`);
+    }
+    if (!pageFormat.mm) {
+        throw new Error(`Unsupported paper format: ${format}`);
+    }
+
+    const mmWidth = pageFormat.mm![0]! / scale +3;
+    const mmHeight = pageFormat.mm![1]! / scale + 3;
+    
+    const mediaPrintCss = `
+            @media print {
+                html, body {
+                    width: ${mmWidth}mm !important;
+                    max-width: ${mmHeight}mm !important;
+                    overflow-x: auto !important;
+                }
+                /** {
+                    max-width: 100% !important;
+                    word-wrap: break-word !important;
+                    overflow-wrap: break-word !important;
+                }*/
+            }
+        `
+
     // append all together
     const finalTemplate = [
         "<html>",
         "<head>",
         "<style>",
+        mediaPrintCss,
         templates.style,
         "</style>",
         "</head>",

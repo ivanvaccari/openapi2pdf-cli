@@ -146,7 +146,7 @@ export class JsonSchemaRender {
         }
 
         // Don't go too deep, instead create a new schema in components/schemas and reference it
-        if (parents.length > 2) {
+        if (parents.length >= 2) {
             this.openApiSpecJson.components = this.openApiSpecJson.components || {};
             this.openApiSpecJson.components.schemas = this.openApiSpecJson.components.schemas || {};
 
@@ -217,8 +217,6 @@ export class JsonSchemaRender {
         html.push("    <div class='schema-properties'>");
         html.push("        <div class='schema-properties-header'>");
         html.push("            <div class='schema-property-name'>Name</div>");
-        html.push("            <div class='schema-property-required'>Required</div>");
-        html.push("            <div class='schema-property-type'>Type</div>");
         html.push("            <div class='schema-property-description'>Description</div>");
         html.push("        </div>"); // end of schema-properties-header
         for (const propertyName in schema.properties) {
@@ -229,15 +227,11 @@ export class JsonSchemaRender {
             const propertySchemaObj = propertySchema as OpenAPIV3.SchemaObject;
             const isRef = !!propertySchemaRef.$ref;
             const format = propertySchemaObj.format ? ` (format: ${propertySchemaObj.format})` : "";
+            const required = schema.required && schema.required.includes(propertyName);
+            const type = `${isRef ? "" : propertySchemaObj.type} ${format}`
 
             html.push("        <div class='schema-property'>");
             html.push(`            <div class='schema-property-name'>${propertyName}</div>`);
-            html.push(`            <div class='schema-property-required'>`);
-            html.push(`                ${schema.required && schema.required.includes(propertyName) ? "Required" : ""}`);
-            html.push(`            </div>`);
-            html.push(
-                `            <div class='schema-property-type'>${isRef ? "" : propertySchemaObj.type} ${format}</div>`,
-            );
             html.push(`            <div class='schema-property-description-container'>`);
 
             if (isRef) {
@@ -247,7 +241,13 @@ export class JsonSchemaRender {
                 const description = await this.renderMarkdown(schema?.description);
 
                 html.push(
-                    `<div class='schema-property-description'>${description}<br><br>See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a></div>`,
+                    `<div class='schema-property-description'>
+                      ${required ? "<span class='required'>Required, </span>" : ""}
+                      ${type ? `<span>${type}${description ? ', ': ''}</span>` : ""}
+                      ${description}
+                      <br><br>
+                      See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a>
+                    </div>`,
                 );
 
                 if (Object.keys(restOfObject).length > 0) {
@@ -256,7 +256,11 @@ export class JsonSchemaRender {
                 }
             } else {
                 const description = await this.renderMarkdown(propertySchemaObj.description);
-                html.push(`<div class='schema-property-description'>${description}</div>`);
+                html.push(`<div class='schema-property-description'>
+                    ${required ? "<span class='required'>Required, </span>" : ""}
+                    ${type ? `<span>${type}${description ? ', ': ''}</span>` : ""}
+                    ${description}
+                </div>`);
 
                 const subProperties = propertySchemaObj.properties;
                 const items = propertySchemaObj.type === "array" ? propertySchemaObj.items : undefined;

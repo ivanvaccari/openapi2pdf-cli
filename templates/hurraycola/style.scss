@@ -13,6 +13,8 @@
     --dark-4: #999999;
     --secondary: #960000;
     --main-title: #555555;
+
+    --danger: #960000;
     --revisions-table-header-bg: var(--bg-light);
     --revisions-table-border: var(--border-light);
     --text-color-description: #444444;
@@ -126,6 +128,11 @@ h4 {
     }
 }
 
+
+.required {
+    color: var(--danger);
+    font-weight: bold;
+}
 /**
 * Rest operation styles
 */
@@ -149,10 +156,12 @@ h4 {
 
         .column-1 {
             font-weight: bold;
-            width: var(--column-1-width);
+            max-width: var(--column-1-width) !important;
+            min-width: var(--column-1-width) !important;
         }
         .column-2 {
-            width: var(--column-2-width);
+            max-width: var(--column-2-width) !important;
+            min-width: var(--column-2-width) !important;
         }
         .column-fill {
             flex-grow: 1;
@@ -359,14 +368,6 @@ pre {
             min-width: var(--column-1-width);
             max-width: var(--column-1-width);
         }
-        .schema-property-required {
-            min-width: calc(var(--column-2-width) / 3);
-            max-width: calc(var(--column-2-width) / 3);
-        }
-        .schema-property-type {
-            min-width: calc(var(--column-2-width) /  3 * 2);
-            max-width: calc(var(--column-2-width) /  3 * 2);
-        }
         .schema-property-description {
             flex-grow: 1;
         }
@@ -386,16 +387,6 @@ pre {
             font-weight: bold;
             min-width: var(--column-1-width);
             max-width: var(--column-1-width);
-        }
-
-        .schema-property-required {
-            min-width: calc(var(--column-2-width) / 3);
-            max-width: calc(var(--column-2-width) / 3);
-        }
-
-        .schema-property-type {
-            min-width: calc(var(--column-2-width) / 3 * 2);
-            max-width: calc(var(--column-2-width) / 3 * 2);
         }
 
         .schema-property-description-container {
