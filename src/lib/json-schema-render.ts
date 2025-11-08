@@ -87,7 +87,7 @@ export class JsonSchemaRender {
 
     /**
      * Iterate over the schema and generate the HTML
-     * 
+     *
      * @param parents A series of strings that indicates the parent property or schema names. Also used to check for deep nesting
      * @param name The name of the current schema
      * @param link The link (id) of the current schema
@@ -138,21 +138,21 @@ export class JsonSchemaRender {
         /**
          * Handle array types
          */
-        if ((schema.type==='array') && schema.items){
+        if (schema.type === "array" && schema.items) {
             const result = await this.iterate(parents, "", "", schema.items);
             html.push(`(Array of following)`);
             html.push(...result.html);
-            return {sub: false, html: html}
+            return { sub: false, html: html };
         }
 
         // Don't go too deep, instead create a new schema in components/schemas and reference it
-        if (parents.length >= 2) {
+        if (parents.length > 2) {
             this.openApiSpecJson.components = this.openApiSpecJson.components || {};
             this.openApiSpecJson.components.schemas = this.openApiSpecJson.components.schemas || {};
 
             let schemaRefLink = `#/components/schemas/${name}`;
             if (!this.openApiSpecJson.components.schemas[name]) {
-                const composedSchemaName = [...parents].join("_").replace(/ /g,'_');
+                const composedSchemaName = [...parents].join("_").replace(/ /g, "_");
                 this.openApiSpecJson.components.schemas[composedSchemaName] = schemaOrReference;
                 schemaRefLink = `#/components/schemas/${composedSchemaName}`;
             }
@@ -178,7 +178,7 @@ export class JsonSchemaRender {
 
         html.push("<div class='schema'>");
         html.push("   <div class='schema-header'>");
-        if(name) {
+        if (name) {
             html.push(`      <div class='schema-title' id='${link.replace("#", "")}'>${name}</div>`);
         }
         html.push(`      <div class='schema-type'>Type: ${schema.type}</div>`);
@@ -228,7 +228,7 @@ export class JsonSchemaRender {
             const isRef = !!propertySchemaRef.$ref;
             const format = propertySchemaObj.format ? ` (format: ${propertySchemaObj.format})` : "";
             const required = schema.required && schema.required.includes(propertyName);
-            const type = `${isRef ? "" : propertySchemaObj.type} ${format}`
+            const type = isRef ? "" : `${propertySchemaObj.type}${format}`;
 
             html.push("        <div class='schema-property'>");
             html.push(`            <div class='schema-property-name'>${propertyName}</div>`);
@@ -243,7 +243,7 @@ export class JsonSchemaRender {
                 html.push(
                     `<div class='schema-property-description'>
                       ${required ? "<span class='required'>Required, </span>" : ""}
-                      ${type ? `<span>${type}${description ? ', ': ''}</span>` : ""}
+                      ${type ? `<span>${type}${description ? ", " : ""}</span>` : ""}
                       ${description}
                       <br><br>
                       See referenced schema <a href="${propertySchemaRef.$ref}">${schemaName}</a>
@@ -256,26 +256,49 @@ export class JsonSchemaRender {
                 }
             } else {
                 const description = await this.renderMarkdown(propertySchemaObj.description);
-                html.push(`<div class='schema-property-description'>
-                    ${required ? "<span class='required'>Required, </span>" : ""}
-                    ${type ? `<span>${type}${description ? ', ': ''}</span>` : ""}
-                    ${description}
-                </div>`);
-
                 const subProperties = propertySchemaObj.properties;
                 const items = propertySchemaObj.type === "array" ? propertySchemaObj.items : undefined;
+                const isReadonly = propertySchemaObj.readOnly;
+
+                let defaultValue: string | undefined = propertySchemaObj.default;
+                if (defaultValue !== undefined) {
+                    defaultValue = "Default value: <b>" + defaultValue + "</b>";
+                }
+
+                let enumValues: string | undefined;
+                if (Array.isArray(propertySchemaObj.enum)) {
+                    enumValues =
+                        "Possible values: <b>" +
+                        propertySchemaObj.enum.map((e) => this.escapeHtml(e)).join(", ") +
+                        "</b>";
+                }
+
+                const flags = [
+                    required ? "<span class='required'>Required</span>" : "",
+                    type ? `<span>${type}</span>` : "",
+                    isReadonly ? "<span class='readonly'>Read-only</span>" : "",
+                ].filter((f) => f !== "").join(", ");
+
+                html.push(`<div class='schema-property-description'>
+                    ${flags}${description ? ', ' : ''}
+                    ${description}
+                    ${enumValues ? `<div class='enum'>${enumValues}</div>` : ""}
+                    ${defaultValue ? `<div class='default-value'>${defaultValue}</div>` : ""}
+                </div>`);
+
                 const restOfObject = _.omit(propertySchemaObj, [
                     "type",
                     "description",
                     "format",
                     "properties",
                     "items",
+                    "enum",
+                    "default",
+                    "readOnly"
                 ]);
                 if (Object.keys(restOfObject).length > 0) {
                     html.push("<div class='schema-property-schema'><pre>");
-                    html.push(
-                        this.escapeHtml(JSON.stringify(_.omit(propertySchemaObj, ["type", "description"]), null, 2)),
-                    );
+                    html.push(this.escapeHtml(JSON.stringify(_.omit(restOfObject), null, 2)));
                     html.push("</pre></div>"); // end of schema-property-schema
                 }
 
@@ -286,8 +309,8 @@ export class JsonSchemaRender {
 
                 if (items) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const title = (items as any).title ?? ("Items of " + propertyName);
-                    
+                    const title = (items as any).title ?? "Items of " + propertyName;
+
                     const result = await this.iterate([...parents, propertyName], title, "", items);
                     if (result.sub) {
                         html.push("<div class='schema-property-items'>");
