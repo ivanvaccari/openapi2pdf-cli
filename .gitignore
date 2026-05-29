@@ -6,4 +6,4 @@ dist
 # test files
 
 openapi.json
-openapi2pdf-test.config.js
+*.config.js

@@ -46,8 +46,6 @@ async function run() {
         throw new Error("OpenAPI specification is empty");
     }
 
-
-
     // start to render the html.
     const renderedContent = await renderHtml(configFile, templates, openApiSpecJson);
 

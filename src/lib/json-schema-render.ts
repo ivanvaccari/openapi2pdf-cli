@@ -51,7 +51,8 @@ export class JsonSchemaRender {
     /**
      *
      */
-    private escapeHtml(text: string) {
+    private escapeHtml(text: string | number) {
+        if (typeof text === "number") return (text = text.toString());
         return text
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
@@ -228,7 +229,7 @@ export class JsonSchemaRender {
             const isRef = !!propertySchemaRef.$ref;
             const format = propertySchemaObj.format ? ` (format: ${propertySchemaObj.format})` : "";
             const required = schema.required && schema.required.includes(propertyName);
-            const type = isRef ? "" : `${propertySchemaObj.type}${format}`;
+            const type = isRef ? "" : (propertySchemaObj.type ? (propertySchemaObj.type+format) : "");
 
             html.push("        <div class='schema-property'>");
             html.push(`            <div class='schema-property-name'>${propertyName}</div>`);
@@ -277,10 +278,12 @@ export class JsonSchemaRender {
                     required ? "<span class='required'>Required</span>" : "",
                     type ? `<span>${type}</span>` : "",
                     isReadonly ? "<span class='readonly'>Read-only</span>" : "",
-                ].filter((f) => f !== "").join(", ");
+                ]
+                    .filter((f) => f !== "")
+                    .join(", ");
 
                 html.push(`<div class='schema-property-description'>
-                    ${flags}${description ? ', ' : ''}
+                    ${flags} ${(flags.length && description) ? ", " : ""}
                     ${description}
                     ${enumValues ? `<div class='enum'>${enumValues}</div>` : ""}
                     ${defaultValue ? `<div class='default-value'>${defaultValue}</div>` : ""}
@@ -294,7 +297,7 @@ export class JsonSchemaRender {
                     "items",
                     "enum",
                     "default",
-                    "readOnly"
+                    "readOnly",
                 ]);
                 if (Object.keys(restOfObject).length > 0) {
                     html.push("<div class='schema-property-schema'><pre>");
