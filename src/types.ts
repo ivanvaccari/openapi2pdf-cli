@@ -102,6 +102,17 @@ export type TemplateFiles = {
      * Body template for methods that support it (like POST, PUT, PATCH)
      */
     operationBody: string;
+
+    /**
+     * Directories of partials. If you want to use partials, you need to provide a directory with the partials files.
+     * The name of the file (excluded .hbs) will be the name of the partial. For example, if you have a file `partials/my-partial.hbs`, you can include it in your templates using `{{> my-partial}}`.
+     */
+    partials?:string
+
+    /**
+     * Internal object where loaded partials are stored.
+     */
+    loadedPartials: {[key: string]: string};
 };
 
 /**

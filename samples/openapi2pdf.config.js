@@ -23,6 +23,8 @@ module.exports = {
             url: "https://petstore.swagger.io/v2"
         }],
         */
+
+        swaggerUrl: "https://petstore.swagger.io/v2",
         revisions: [{
                 version:'1.0.0',
                 date: '2024-06-01',
@@ -55,7 +57,7 @@ module.exports = {
             left: "10mm"
         },
         format: "A4",
-        scale: 0.70
+        scale: 1
     },
     outputFiles: {
         pdf: "samples/pet-store.pdf",

@@ -28,6 +28,8 @@ export const templateFilenames: TemplateFiles = {
     schemas: "schemas.hbs",
     tocTag: "toc-tag.hbs",
     operationBody: "operation-body.hbs",
+    partials: "partials",
+    loadedPartials: {},
 };
 
 /**
@@ -36,7 +38,6 @@ export const templateFilenames: TemplateFiles = {
  * @returns
  */
 export async function loadTemplateFiles(configFile: ConfigFile): Promise<TemplateFiles> {
-
     console.log("Loading template files...");
     // default to "postman" template if not provided
     if (!configFile.template) {
@@ -79,6 +80,26 @@ export async function loadTemplateFiles(configFile: ConfigFile): Promise<Templat
         throw new Error(`Template ${templateName} not found in any of the template paths tried`);
     };
 
+    async function _parseImg(templateContent: string): Promise<string> {
+        const imgRegex = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*>/gm;
+        const imgMatcher = templateContent.matchAll(imgRegex);
+        for (const match of imgMatcher) {
+            const originalSrc = match[1];
+            if (originalSrc) {
+                try {
+                    const fileBufer = await fs.readFile(await _findFilePath(originalSrc));
+                    const base64Data = fileBufer.toString("base64");
+                    const ext = path.extname(originalSrc).substring(1);
+                    const dataUrl = `data:image/${ext};base64,${base64Data}`;
+                    templateContent = templateContent.replace(originalSrc, dataUrl);
+                } catch (err: any) {
+                    console.warn(`Warning: could not resolve <img src="${originalSrc}">: ${err.message}`);
+                }
+            }
+        }
+        return templateContent;
+    }
+
     const templates: TemplateFiles = { ...templateFilenames };
 
     // load the templates
@@ -87,7 +108,16 @@ export async function loadTemplateFiles(configFile: ConfigFile): Promise<Templat
 
         // Ignore style here, it will be processed later
         if (key === "style") continue;
-
+        if (key === "loadedPartials") continue;
+        if (key === "partials") {
+            try {
+                templates[key] = await _findFilePath(templates.partials!);
+                continue;
+            } catch (err) {
+                console.warn(`No partials directory provided, skipping partials registration.`, err);
+                continue;
+            }
+        }
         const contentBuffer = await fs.readFile(await _findFilePath(templates[key]));
         templates[key] = contentBuffer.toString();
     }
@@ -119,28 +149,37 @@ export async function loadTemplateFiles(configFile: ConfigFile): Promise<Templat
         }
     }
 
+    const partials: {[p:string]:string}= {};
+
+    if (templates.partials) {
+        console.log(`Registering partials from ${templates.partials}...`);
+        const partialsDir = templates.partials;
+        const files = await fs.readdir(partialsDir);
+        const hbsFiles = files.filter((f) => f.endsWith(".hbs"));
+        for (const file of hbsFiles) {
+            const name = path.basename(file, ".hbs");
+            const content = await fs.readFile(path.join(partialsDir, file), "utf-8");
+            partials[name] = content;
+            // Handlebars.registerPartial(name, content);
+            //console.log(`Registered partial: ${name}`);
+        }
+    }
+
     // resolves "<img src="...">" in tempates to base64 imgs
     // <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...)
     // so there's no problems with paths later
-    const imgRegex = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*>/gm;
     for (const key of Object.keys(templates) as (keyof TemplateFiles)[]) {
-        const templateContent = templates[key];
-        const imgMatcher = templateContent.matchAll(imgRegex);
-        for (const match of imgMatcher) {
-            const originalSrc = match[1];
-            if (originalSrc) {
-                try {
-                    const fileBufer = await fs.readFile(await _findFilePath(originalSrc));
-                    const base64Data = fileBufer.toString("base64");
-                    const ext = path.extname(originalSrc).substring(1);
-                    const dataUrl = `data:image/${ext};base64,${base64Data}`;
-                    templates[key] = templates[key].replace(originalSrc, dataUrl);
-                } catch (err: any) {
-                    console.warn(`Warning: could not resolve <img src="${originalSrc}">: ${err.message}`);
-                }
-            }
-        }
+        if (!templates[key]) continue;
+        if (key !== "loadedPartials")
+        templates[key] = await _parseImg(templates[key]!);
     }
+
+    for (const key of Object.keys(partials) as string[]) {
+        if (!partials[key]) continue;
+        partials[key] = await _parseImg(partials[key]!);
+    }
+
+    templates.loadedPartials = partials;
 
     return templates;
 }
@@ -188,7 +227,7 @@ export async function renderHtml(
     // format is A4 by default
     const format = (configFile.pdfOptions?.format || "A4") as keyof typeof paperSizes;
     const scale = configFile.pdfOptions?.scale || 1;
-    const pageFormat = paperSizes[format]
+    const pageFormat = paperSizes[format];
     if (!pageFormat) {
         throw new Error(`Unsupported paper format: ${format}`);
     }
@@ -196,9 +235,9 @@ export async function renderHtml(
         throw new Error(`Unsupported paper format: ${format}`);
     }
 
-    const mmWidth = pageFormat.mm![0]! / scale +3;
+    const mmWidth = pageFormat.mm![0]! / scale + 3;
     const mmHeight = pageFormat.mm![1]! / scale + 3;
-    
+
     const mediaPrintCss = `
             @media print {
                 html, body {
@@ -212,7 +251,7 @@ export async function renderHtml(
                     overflow-wrap: break-word !important;
                 }*/
             }
-        `
+        `;
 
     // append all together
     const finalTemplate = [

@@ -25,6 +25,8 @@
     --size-h2: 160%;
     --size-h3: 140%;
     --size-h4: 120%;
+    --size-h5: 110%;
+    --size-h6: 100%;
 
     --column-1-width: 200px;
     --column-2-width: 250px;
@@ -33,7 +35,7 @@
 html,
 body {
     color: var(--dark-1);
-    font-family: "Arial narrow", Arial, sans-serif;
+    font-family:  Arial, sans-serif;
 
     /* Force content to stay within page boundaries */
     max-width: 100%;
@@ -70,6 +72,24 @@ h4 {
     margin-bottom: 6px;
     border-bottom: 2px solid var(--dark-4);
 }
+
+
+h5 {
+    font-size: var(--size-h5);
+    margin-top: 1em;
+    margin-bottom: 6px;
+    border-bottom: 2px solid var(--dark-4);
+}
+
+
+h6 {
+    font-size: var(--size-h6);
+    margin-top: 1em;
+    margin-bottom: 6px;
+    border-bottom: 2px solid var(--dark-4);
+}
+
+
 
 /**
 * Front page styles

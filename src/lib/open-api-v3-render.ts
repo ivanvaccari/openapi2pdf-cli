@@ -9,6 +9,8 @@ import _ from "lodash";
 import { marked } from "marked";
 import { JsonSchemaRender } from "./json-schema-render";
 import Handlebars from "handlebars";
+import fs from "fs";
+import path from "path";
 
 export class OpenApiV3Render {
     private html: string[] = [];
@@ -25,7 +27,6 @@ export class OpenApiV3Render {
     private configFile: ConfigFile;
     private templates: TemplateFiles;
     private openApiSpecJson: OpenAPIV3.Document;
-
     constructor(configFile: ConfigFile, templates: TemplateFiles, openApiSpecJson: OpenAPIV3.Document) {
         this.templates = templates;
         this.configFile = configFile;
@@ -41,6 +42,13 @@ export class OpenApiV3Render {
         this.apiTemplate = Handlebars.compile(this.templates.api);
         this.schemasTemplate = Handlebars.compile(this.templates.schemas);
         this.operationBodyTemplate = Handlebars.compile(this.templates.operationBody);
+        if (this.templates.loadedPartials) {
+            console.log(`Registering partials from ${this.templates.partials}...`);
+            Object.keys(this.templates.loadedPartials).forEach((partialName) => {
+                Handlebars.registerPartial(partialName, this.templates.loadedPartials[partialName]!);
+                console.log(`Registered partial: ${partialName}`);
+            });
+        }
     }
 
     /**
@@ -136,9 +144,9 @@ export class OpenApiV3Render {
 
         // The object changes while iterating, so i'm using a very discutible mode to iterate
         // over an object that is being changed during iteration
-        while(true){
+        while (true) {
             const schemaName = Object.keys(this.openApiSpecJson.components?.[where] ?? {})[0];
-            if(!schemaName) break;
+            if (!schemaName) break;
 
             // grab one schema and remove it from the list so that next iteration will get the next one
             const schema = this.openApiSpecJson.components?.[where]?.[schemaName];

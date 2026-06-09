@@ -60,7 +60,7 @@ module.exports = {
 
 `json` files directly contain the [ConfigFile](./src/types.ts) object.
 
-See an example configuration file here: [samples\openapi2pdf-test.config.js](./samples/openapi2pdf-test.config.js). The full set of available options is described in [ConfigFile type](./src/types.ts) file.
+See an example configuration file here: [samples\openapi2pdf.config.js](./samples/openapi2pdf.config.js). The full set of available options is described in [ConfigFile type](./src/types.ts) file.
 
 ## Templates
 
@@ -96,6 +96,7 @@ Based on your case, you can use one of the built-in templates as a starting poin
 - `schemas.hbs`: template for the schemas section of the documentation
 - `summary.hbs`: template for the summary page of the documentation
 - `revisions.hbs`: template for the revisions page of the documentation
+- `partials/`: directory for partials, which are reusable templates that can be included in other templates. You can define your own partials and use them in your templates. The name of the file partial (excluded .hbs) will be the name of the partial. For example, if you have a file `partials/my-partial.hbs`, you can include it in your templates using `{{> my-partial}}`.
 
 
 ## Examples
