@@ -187,17 +187,17 @@ export async function loadTemplateFiles(configFile: ConfigFile): Promise<Templat
 /**
  * Renders HTML content using Handlebars template engine.
  *
- * @param templateContent
- * @param data
+ * @param configFile Generator config file
+ * @param templates Loaded template files content
+ * @param openApiSpecJson The full loaded OpenAPI specification JSON object
+ * 
  */
 export async function renderHtml(
     configFile: ConfigFile,
     templates: TemplateFiles,
     openApiSpecJson: OpenAPIV3.Document | OpenAPIV3_1.Document,
 ): Promise<{ body: string; header: string; footer: string }> {
-    // preventively resolve all $ref in the OpenAPI spec so we now can assume all schemas contains the direct values
-    // instead of having to resolve them during templating
-    // openApiSpecJson = resolveRefs(_.cloneDeep(openApiSpecJson) as OpenAPIV3.Document);
+
 
     // Generate the handlebars template for the OpenAPI spec
     let openApiSpectHtml = "";

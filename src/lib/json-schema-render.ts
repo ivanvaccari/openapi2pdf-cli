@@ -12,11 +12,23 @@ import { marked } from "marked";
  *
  */
 export class JsonSchemaRender {
+    private extraSchemasAdded: { [k: string]: any } = {};
+
+    /**
+     * Return a extra set of schemas that were added to the specification and 
+     * need to be merged to the original one
+     * @returns 
+     */
+    public getExtraSchemasAdded() {
+        return this.extraSchemasAdded;
+    }
+
     /**
      *
      * @param name
+     * @param link
      * @param schema
-     * @param fullSchema
+     * @param openApiSpecJson The full loaded OpenAPI specification JSON object. This is needed to resolve $ref and to add new schemas in case of deep nesting.
      */
     constructor(
         protected name: string,
@@ -27,7 +39,8 @@ export class JsonSchemaRender {
             | OpenAPIV3_1.SchemaObject
             | OpenAPIV3_1.ReferenceObject,
         protected openApiSpecJson: OpenAPIV3.Document<object> | OpenAPIV3_1.Document<object>,
-    ) {}
+    ) {
+    }
 
     /**
      * Gets a schema from a ref
@@ -148,14 +161,15 @@ export class JsonSchemaRender {
 
         // Don't go too deep, instead create a new schema in components/schemas and reference it
         if (parents.length > 2) {
-            this.openApiSpecJson.components = this.openApiSpecJson.components || {};
-            this.openApiSpecJson.components.schemas = this.openApiSpecJson.components.schemas || {};
+            this.openApiSpecJson.components = this.openApiSpecJson.components ?? {};
+            this.openApiSpecJson.components.schemas = this.openApiSpecJson.components.schemas ?? {};
 
             let schemaRefLink = `#/components/schemas/${name}`;
             if (!this.openApiSpecJson.components.schemas[name]) {
                 const composedSchemaName = [...parents].join("_").replace(/ /g, "_");
                 this.openApiSpecJson.components.schemas[composedSchemaName] = schemaOrReference;
                 schemaRefLink = `#/components/schemas/${composedSchemaName}`;
+                this.extraSchemasAdded[composedSchemaName] = schemaOrReference;
             }
 
             html.push(`See referenced schema <a href="${schemaRefLink}">${name}</a>`);
@@ -170,7 +184,7 @@ export class JsonSchemaRender {
         let sample = "";
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            sample = await this.jsonToHtml(OpenApiSampler(schema as any, {}, this.schema));
+            sample = await this.jsonToHtml(OpenApiSampler(schema as any, {}, this.openApiSpecJson));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Error generating sample for schema", name, error?.message);
@@ -229,7 +243,7 @@ export class JsonSchemaRender {
             const isRef = !!propertySchemaRef.$ref;
             const format = propertySchemaObj.format ? ` (format: ${propertySchemaObj.format})` : "";
             const required = schema.required && schema.required.includes(propertyName);
-            const type = isRef ? "" : (propertySchemaObj.type ? (propertySchemaObj.type+format) : "");
+            const type = isRef ? "" : propertySchemaObj.type ? propertySchemaObj.type + format : "";
 
             html.push("        <div class='schema-property'>");
             html.push(`            <div class='schema-property-name'>${propertyName}</div>`);
@@ -283,7 +297,7 @@ export class JsonSchemaRender {
                     .join(", ");
 
                 html.push(`<div class='schema-property-description'>
-                    ${flags} ${(flags.length && description) ? ", " : ""}
+                    ${flags} ${flags.length && description ? ", " : ""}
                     ${description}
                     ${enumValues ? `<div class='enum'>${enumValues}</div>` : ""}
                     ${defaultValue ? `<div class='default-value'>${defaultValue}</div>` : ""}

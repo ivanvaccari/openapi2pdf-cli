@@ -9,8 +9,6 @@ import _ from "lodash";
 import { marked } from "marked";
 import { JsonSchemaRender } from "./json-schema-render";
 import Handlebars from "handlebars";
-import fs from "fs";
-import path from "path";
 
 export class OpenApiV3Render {
     private html: string[] = [];
@@ -26,7 +24,16 @@ export class OpenApiV3Render {
     private operationBodyTemplate: Handlebars.TemplateDelegate;
     private configFile: ConfigFile;
     private templates: TemplateFiles;
+
+    /** Full openapi loaded object */
     private openApiSpecJson: OpenAPIV3.Document;
+
+    /**
+     * 
+     * @param configFile Generator config file
+     * @param templates Loaded template files content
+     * @param openApiSpecJson The full loaded OpenAPI specification JSON object
+     */
     constructor(configFile: ConfigFile, templates: TemplateFiles, openApiSpecJson: OpenAPIV3.Document) {
         this.templates = templates;
         this.configFile = configFile;
@@ -142,19 +149,32 @@ export class OpenApiV3Render {
     private async processComponents(where: "schemas"): Promise<string> {
         const schemaHtmlLines: string[] = [];
 
+        if (!this.openApiSpecJson.components?.[where]) return '';
+
         // The object changes while iterating, so i'm using a very discutible mode to iterate
         // over an object that is being changed during iteration
-        while (true) {
-            const schemaName = Object.keys(this.openApiSpecJson.components?.[where] ?? {})[0];
+        let schemaNames = Object.keys(this.openApiSpecJson.components?.[where] ?? {});
+        while (schemaNames.length) {
+            const schemaName = schemaNames.shift();
             if (!schemaName) break;
 
             // grab one schema and remove it from the list so that next iteration will get the next one
             const schema = this.openApiSpecJson.components?.[where]?.[schemaName];
-            delete this.openApiSpecJson.components?.[where]?.[schemaName];
+            //delete this.openApiSpecJson.components?.[where]?.[schemaName];
 
             if (schema) {
                 const link = "#/components/schemas/" + schemaName;
-                const schemaHtml = await new JsonSchemaRender(schemaName, link, schema, this.openApiSpecJson).render();
+                const jsr: JsonSchemaRender = new JsonSchemaRender(schemaName, link, schema, this.openApiSpecJson);
+                const schemaHtml = await jsr.render();
+                const extraGeneratedSchemas = jsr.getExtraSchemasAdded();
+                if (Object.keys(extraGeneratedSchemas).length > 0) {
+                    this.openApiSpecJson.components[where] = {
+                        ...this.openApiSpecJson.components[where],
+                        ...extraGeneratedSchemas,
+                    };
+                    schemaNames = [...schemaNames, ...Object.keys(extraGeneratedSchemas)];
+                }
+
                 schemaHtmlLines.push(schemaHtml);
             }
         }
